@@ -64,12 +64,11 @@
         .ticker-container { background: #0b0c1f; border: 1px solid var(--border-glow); padding: 8px 20px; border-radius: 8px; font-size: 0.8rem; color: #94a3b8; overflow: hidden; white-space: nowrap; }
         .ticker-wrap { display: inline-block; animation: marquee 25s linear infinite; }
 
-        /* Notification Toast Container */
-        #completionToastContainer { position: fixed; bottom: 65px; right: 25px; display: flex; flex-direction: column; gap: 10px; z-index: 10000; }
-        .toast-card { background: rgba(11, 12, 31, 0.95); border-left: 5px solid var(--action-green); border-top: 1px solid var(--border-glow); border-bottom: 1px solid var(--border-glow); border-right: 1px solid var(--border-glow); backdrop-filter: blur(20px); padding: 18px 25px; border-radius: 8px; width: 420px; color: #fff; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); animation: slideInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .toast-card h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--action-green); letter-spacing: 1px; font-weight: 800; }
-        .toast-card h3 { font-size: 1.4rem; font-weight: 800; }
-        .toast-card p { font-size: 0.85rem; color: #94a3b8; }
+        /* Full Screen Takeover Layer for Completions */
+        #jobFinishedOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #03040a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10005; animation: fadeIn 0.2s ease forwards; }
+        .finished-title-hero { font-size: 5rem; font-weight: 900; color: var(--action-green); text-transform: uppercase; letter-spacing: -1px; margin-bottom: 10px; }
+        .finished-vehicle-display { font-family: 'Inter', sans-serif; font-size: 9rem; font-weight: 800; color: #fff; line-height: 1; margin: 20px 0; }
+        .finished-meta-sub { color: #94a3b8; font-weight: 600; font-size: 2rem; letter-spacing: 2px; text-transform: uppercase; }
 
         #lunchOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #03040a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
         .lunch-title-hero { font-size: 5.5rem; font-weight: 900; color: var(--action-amber); text-transform: uppercase; letter-spacing: -1px; }
@@ -77,19 +76,23 @@
 
         @keyframes marquee { 0% { transform: translate3d(100%, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @keyframes slideInRight { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
+
+    <!-- Full-Screen Takeover Completion Layer -->
+    <div id="jobFinishedOverlayLayer">
+        <div class="finished-title-hero">🏁 JOB COMPLETED</div>
+        <div class="finished-vehicle-display" id="popupVehicleCode">---</div>
+        <div class="finished-meta-sub" id="popupJobMeta">TECH: ---</div>
+    </div>
 
     <div id="lunchOverlayLayer">
         <div class="lunch-title-hero">🍱 LUNCH BREAK</div>
         <div style="color: #64748b; font-weight: 700; font-size: 1.5rem; letter-spacing: 4px;">WORKSHOP OPERATIONS SUSPENDED</div>
         <div class="lunch-countdown-display" id="lunchCountdownClock">00:00</div>
     </div>
-
-    <!-- Active Popup Anchor Context -->
-    <div id="completionToastContainer"></div>
 
     <header>
         <div class="brand-block">
@@ -149,7 +152,40 @@
         let initialLoadComplete = false;
         let runningJobStates = {}; 
         
-        // Dynamic Midnight Reset Watcher
+        // Synth Audio Generator Context Engine
+        function playChimeNotification() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Note 1 (E5)
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime); 
+                gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 0.4);
+
+                // Note 2 (A5) played slightly later
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880.00, audioCtx.currentTime); 
+                    gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.6);
+                }, 150);
+
+            } catch(e) { console.log("Audio couldn't play: Browser interaction limit.", e); }
+        }
+
         setInterval(() => {
             const now = new Date();
             document.getElementById("headerClockField").innerText = now.toLocaleTimeString();
@@ -161,35 +197,23 @@
                 } else if (doc.data().lastDate !== currentStringDate) {
                     db.collection("system_state").doc("calendar_tracking").set({ lastDate: currentStringDate });
                     db.collection("pending_jobs").get().then((snap) => {
-                        snap.forEach((documentLog) => {
-                            documentLog.ref.delete();
-                        });
+                        snap.forEach((documentLog) => { documentLog.ref.delete(); });
                     });
                 }
             });
         }, 1000);
 
-        // Toast Trigger Core Logic
-        function triggerCompletionToast(vehicle, classification, technician) {
-            const container = document.getElementById("completionToastContainer");
-            const toast = document.createElement("div");
-            toast.className = "toast-card";
+        // Big Full-Screen Takeover Handler
+        function triggerFullScreenCompletion(vehicle, classification, technician) {
+            const layer = document.getElementById("jobFinishedOverlayLayer");
+            document.getElementById("popupVehicleCode").innerText = vehicle;
+            document.getElementById("popupJobMeta").innerText = `${classification} • Tech: ${technician}`;
             
-            toast.innerHTML = `
-                <h4>🏁 Job Completed Successfully</h4>
-                <h3>${vehicle}</h3>
-                <p>Track: <strong>${classification}</strong> • Technician: <strong>${technician}</strong></p>
-            `;
-            
-            container.appendChild(toast);
-            
+            layer.style.display = "flex";
+            playChimeNotification();
+
             setTimeout(() => {
-                toast.style.animation = "none"; 
-                toast.offsetHeight; 
-                toast.style.transition = "all 0.4s ease";
-                toast.style.transform = "translateX(120%)";
-                toast.style.opacity = "0";
-                setTimeout(() => { toast.remove(); }, 400);
+                layer.style.display = "none";
             }, 5000);
         }
 
@@ -239,9 +263,8 @@
                 const id = doc.id;
                 currentSnapshotJobs[id] = job.status;
                 
-                // Real-time Event Mutation Tracking for Completion Popups
                 if (initialLoadComplete && job.status === "Finished" && runningJobStates[id] && runningJobStates[id] !== "Finished") {
-                    triggerCompletionToast(job.vehicle, job.jobType || 'General Service', job.technician);
+                    triggerFullScreenCompletion(job.vehicle, job.jobType || 'General Service', job.technician);
                 }
 
                 if (job.status === "Finished") {
