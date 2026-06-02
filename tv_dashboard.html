@@ -42,7 +42,10 @@
         .section-header-banner { background: rgba(255,255,255,0.02); padding: 10px 25px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-glow); display: flex; justify-content: space-between; }
         
         .matrix-th-row { display: grid; grid-template-columns: 2.5fr 2fr 2fr 2fr 1.5fr; padding: 12px 25px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-glow); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
-        .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; flex-grow: 1; }
+        
+        /* Queue Flow Container - Added properties to hide scrollbar for TV UI */
+        .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; flex-grow: 1; -ms-overflow-style: none; scrollbar-width: none; }
+        .matrix-tbody-flow::-webkit-scrollbar { display: none; }
         
         .matrix-body-row { display: grid; grid-template-columns: 2.5fr 2fr 2fr 2fr 1.5fr; padding: 15px 25px; border-bottom: 1px solid var(--border-glow); align-items: center; animation: fadeIn 0.4s ease; }
         .matrix-body-row.row-Paused { background: rgba(255, 183, 3, 0.01); border-left: 4px solid var(--action-amber); }
@@ -156,6 +159,7 @@
         let finishedJobsList = []; 
         let isLunchBreakActive = false;
         
+        // Setup clock and auto daily reset
         setInterval(() => {
             const now = new Date();
             document.getElementById("headerClockField").innerText = now.toLocaleTimeString();
@@ -172,6 +176,34 @@
                 }
             });
         }, 1000);
+
+        // -- AUTO SCROLL LOGIC FOR ACTIVE QUEUE --
+        let autoScrollEngine = null;
+        let isScrollingPaused = false;
+
+        function startQueueAutoScroll() {
+            const container = document.getElementById("tvActiveQueueBody");
+            if (autoScrollEngine) clearInterval(autoScrollEngine);
+
+            autoScrollEngine = setInterval(() => {
+                // If scroll is paused or content doesn't overflow, do nothing
+                if (isScrollingPaused || container.scrollHeight <= container.clientHeight) return;
+
+                // Check if scroll has reached the bottom
+                if (container.scrollTop + container.clientHeight >= container.scrollHeight - 1) {
+                    isScrollingPaused = true;
+                    // Pause for 2 seconds at the bottom before jumping back up
+                    setTimeout(() => {
+                        container.scrollTop = 0; 
+                        // Pause for 2 seconds at the top before resuming scroll
+                        setTimeout(() => { isScrollingPaused = false; }, 2000);
+                    }, 2000); 
+                } else {
+                    container.scrollTop += 1; // Scroll down 1px
+                }
+            }, 60); // Speed: scrolls every 60 milliseconds
+        }
+        // ----------------------------------------
 
         // -- LIST ROTATION LOGIC START --
         let rotationTimer = null;
@@ -220,6 +252,7 @@
         }
         // -- LIST ROTATION LOGIC END --
 
+        // -- LUNCH BREAK LOGIC --
         let lunchCountdownEngine = null;
         db.collection("system_state").doc("lunch_break").onSnapshot((doc) => {
             const data = doc.data();
@@ -253,6 +286,7 @@
             }
         });
 
+        // -- MAIN DATABASE SNAPSHOT & RENDER --
         db.collection("pending_jobs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const activeContainer = document.getElementById("tvActiveQueueBody");
             activeContainer.innerHTML = "";
@@ -335,6 +369,9 @@
             document.getElementById("mRatio").innerText = (tallyActive + tallyDone) > 0 ? Math.round((tallyDone / (tallyActive + tallyDone)) * 100) + '%' : '100%';
             
             document.getElementById("countActiveSection").innerText = `${tallyActive} Units Tracked`;
+
+            // Engage auto-scroll engine after UI populated
+            setTimeout(startQueueAutoScroll, 500);
         });
     </script>
 </body>
