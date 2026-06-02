@@ -45,7 +45,6 @@
         .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; flex-grow: 1; }
         
         .matrix-body-row { display: grid; grid-template-columns: 2.5fr 2fr 2fr 2fr 1.5fr; padding: 15px 25px; border-bottom: 1px solid var(--border-glow); align-items: center; animation: fadeIn 0.4s ease; }
-        .matrix-body-row.row-Finished { opacity: 0.35; background: rgba(0,0,0,0.25); border-left: 4px solid var(--action-green); }
         .matrix-body-row.row-Paused { background: rgba(255, 183, 3, 0.01); border-left: 4px solid var(--action-amber); }
         .matrix-body-row.row-Pending { border-left: 4px solid var(--action-cyan); }
         .matrix-body-row.high-priority { background: rgba(255, 77, 109, 0.03); }
@@ -53,12 +52,11 @@
         .job-identity-block h2 { font-size: 1.3rem; font-weight: 800; color: #fff; }
         .job-identity-block p { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
         
-        .classification-pill { inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; background: rgba(0, 180, 216, 0.08); color: var(--action-cyan); }
+        .classification-pill { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; background: rgba(0, 180, 216, 0.08); color: var(--action-cyan); }
         .classification-pill.accident-mode { background: rgba(255, 77, 109, 0.08); color: var(--action-rose); }
 
         .chrono-clock-value { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; color: var(--action-green); }
         .chrono-clock-value.paused-text { color: var(--action-amber); }
-        .chrono-clock-value.finished-text { color: #64748b; }
 
         .priority-indicator { font-weight: 800; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
         .priority-indicator.flag-high { color: var(--action-rose); animation: pulse 1.5s infinite; }
@@ -109,19 +107,12 @@
         <div class="matrix-th-row">
             <div>Vehicle ID / Cloud Verification</div>
             <div>Classification</div>
-            <div>Engineer</div>
+            <div>Technician</div>
             <div>Production Chrono</div>
             <div>Priority Level</div>
         </div>
         
-        <div class="matrix-tbody-flow" id="tvActiveQueueBody" style="max-height: 40vh;"></div>
-
-        <div class="section-header-banner" style="color: var(--action-green); background: rgba(6,214,160,0.03); border-top: 1px solid var(--border-glow);">
-            <span>🏁 Section II: Completed Log History (Cleared Clearance Records)</span>
-            <span id="countDoneSection">0 Units Finished</span>
-        </div>
-        
-        <div class="matrix-tbody-flow" id="tvCompletedQueueBody" style="max-height: 25vh; background: rgba(0,0,0,0.1);"></div>
+        <div class="matrix-tbody-flow" id="tvActiveQueueBody"></div>
     </div>
 
     <div class="ticker-container">
@@ -146,8 +137,26 @@
 
         let activeTimers = {};
         
+        // Dynamic Midnight Reset Watcher
         setInterval(() => {
-            document.getElementById("headerClockField").innerText = new Date().toLocaleTimeString();
+            const now = new Date();
+            document.getElementById("headerClockField").innerText = now.toLocaleTimeString();
+            
+            // Check calendar change across days
+            const currentStringDate = now.toDateString();
+            db.collection("system_state").doc("calendar_tracking").get().then((doc) => {
+                if (!doc.exists) {
+                    db.collection("system_state").doc("calendar_tracking").set({ lastDate: currentStringDate });
+                } else if (doc.data().lastDate !== currentStringDate) {
+                    // Midnight boundary crossed! Execute purge
+                    db.collection("system_state").doc("calendar_tracking").set({ lastDate: currentStringDate });
+                    db.collection("pending_jobs").get().then((snap) => {
+                        snap.forEach((documentLog) => {
+                            documentLog.ref.delete();
+                        });
+                    });
+                }
+            });
         }, 1000);
 
         let lunchCountdownEngine = null;
@@ -183,10 +192,7 @@
 
         db.collection("pending_jobs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const activeContainer = document.getElementById("tvActiveQueueBody");
-            const completedContainer = document.getElementById("tvCompletedQueueBody");
-            
             activeContainer.innerHTML = "";
-            completedContainer.innerHTML = "";
 
             for (let k in activeTimers) { clearInterval(activeTimers[k]); }
             activeTimers = {};
@@ -197,23 +203,21 @@
                 const job = doc.data();
                 const id = doc.id;
                 
-                // Highlight color rule updates
+                if (job.status === "Finished") {
+                    tallyDone++; // Keep counter active while dropping entry mapping down below
+                    return; 
+                }
+
+                tallyActive++;
+                if(job.priority === "High") tallyHigh++;
+
                 const typeLower = (job.jobType || "").toLowerCase();
                 const isCriticalTrack = typeLower.includes("body shop") || typeLower.includes("ac repair");
-                
-                if (job.status !== "Finished") {
-                    tallyActive++;
-                    if(job.priority === "High") tallyHigh++;
-                } else {
-                    tallyDone++;
-                }
 
                 const row = document.createElement("div");
                 row.className = `matrix-body-row row-${job.status} ${job.priority === 'High' ? 'high-priority' : ''}`;
                 
-                let timeColorClass = "";
-                if(job.status === "Paused") timeColorClass = "paused-text";
-                if(job.status === "Finished") timeColorClass = "finished-text";
+                let timeColorClass = job.status === "Paused" ? "paused-text" : "";
 
                 row.innerHTML = `
                     <div class="job-identity-block">
@@ -226,11 +230,7 @@
                     <div class="priority-indicator ${job.priority === 'High' ? 'flag-high' : ''}">${job.priority || 'Normal'}</div>
                 `;
 
-                if (job.status === "Finished") {
-                    completedContainer.appendChild(row);
-                } else {
-                    activeContainer.appendChild(row);
-                }
+                activeContainer.appendChild(row);
 
                 const initializedTime = job.timestamp ? job.timestamp.toDate() : new Date();
                 
@@ -261,7 +261,6 @@
             document.getElementById("mRatio").innerText = (tallyActive + tallyDone) > 0 ? Math.round((tallyDone / (tallyActive + tallyDone)) * 100) + '%' : '100%';
             
             document.getElementById("countActiveSection").innerText = `${tallyActive} Units Tracked`;
-            document.getElementById("countDoneSection").innerText = `${tallyDone} Units Closed`;
         });
     </script>
 </body>
