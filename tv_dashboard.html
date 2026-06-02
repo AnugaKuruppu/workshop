@@ -3,168 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GT AutoMech - Production Execution System</title>
+    <title>GT AutoMech - Matrix Execution Screen</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-base: #060713;
-            --bg-panel: rgba(14, 16, 32, 0.7);
+            --bg-panel: rgba(14, 16, 32, 0.85);
             --bg-card: #0f1126;
-            --border-glow: rgba(255, 255, 255, 0.05);
+            --border-glow: rgba(255, 255, 255, 0.04);
             --text-main: #f1f5f9;
             --action-cyan: #00b4d8;
             --action-green: #06d6a0;
             --action-amber: #ffb703;
             --action-rose: #ff4d6d;
+            --action-purple: #b5179e;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
+        body { background-color: var(--bg-base); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow: hidden; }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-panel);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--border-glow);
-            padding: 20px 35px;
-            border-radius: 14px;
+            display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel);
+            backdrop-filter: blur(30px); border: 1px solid var(--border-glow); padding: 15px 30px; border-radius: 12px;
         }
-        .brand-block h1 { font-size: 2.2rem; font-weight: 800; text-transform: uppercase; }
-        .brand-block span { color: var(--action-cyan); font-weight: 700; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
+        .brand-block h1 { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; }
+        .brand-block span { color: var(--action-cyan); font-weight: 700; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
         
-        .sys-meta-telemetry { display: flex; gap: 40px; align-items: center; text-align: right; }
-        .meta-node-title { font-size: 0.75rem; color: #475569; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-        .meta-node-value { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; color: #94a3b8; }
-        .meta-node-value.status-on { color: var(--action-green); font-family: 'Inter', sans-serif; }
+        .sys-meta-telemetry { display: flex; gap: 30px; align-items: center; }
+        .meta-node-title { font-size: 0.65rem; color: #64748b; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .meta-node-value { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #e2e8f0; }
 
-        .metrics-row-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .metric-widget-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            border-left: 5px solid var(--accent-line, var(--action-cyan));
-            border-radius: 12px;
-            padding: 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .metric-meta-lbl { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
-        .metric-counter-big { font-size: 2.4rem; font-weight: 800; color: #fff; margin-top: 5px; }
+        .metrics-row-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .metric-widget-card { background: var(--bg-card); border: 1px solid var(--border-glow); border-left: 4px solid var(--accent-line, var(--action-cyan)); border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .metric-meta-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+        .metric-counter-big { font-size: 2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono'; }
 
-        .matrix-board-wrapper {
-            background: var(--bg-panel);
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--border-glow);
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            overflow: hidden;
-        }
-        .matrix-th-row {
-            display: grid;
-            grid-template-columns: 3.5fr 2fr 2.5fr 2.5fr 2fr;
-            padding: 18px 35px;
-            background: rgba(255,255,255,0.01);
-            border-bottom: 1px solid var(--border-glow);
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #64748b;
-        }
-        .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; max-height: 50vh; }
+        .matrix-board-wrapper { background: var(--bg-panel); backdrop-filter: blur(30px); border: 1px solid var(--border-glow); border-radius: 14px; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
+        .section-header-banner { background: rgba(255,255,255,0.02); padding: 10px 25px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-glow); display: flex; justify-content: space-between; }
         
-        .matrix-body-row {
-            display: grid;
-            grid-template-columns: 3.5fr 2fr 2.5fr 2.5fr 2fr;
-            padding: 24px 35px;
-            border-bottom: 1px solid var(--border-glow);
-            align-items: center;
-        }
-        .matrix-body-row.row-Finished { opacity: 0.4; background: rgba(0,0,0,0.2); }
-        .matrix-body-row.row-Paused { background: rgba(255, 183, 3, 0.02); }
-
-        .job-identity-block h2 { font-size: 1.5rem; font-weight: 800; color: #fff; }
-        .job-identity-block span { font-size: 0.8rem; color: #475569; font-family: 'JetBrains Mono', monospace; display: block; margin-top: 4px; }
+        .matrix-th-row { display: grid; grid-template-columns: 2.5fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr; padding: 12px 25px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-glow); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
+        .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; flex-grow: 1; }
         
-        .classification-pill {
-            display: inline-block; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
-            background: rgba(0, 180, 216, 0.08); color: var(--action-cyan); border: 1px solid rgba(0, 180, 216, 0.15);
-        }
-        .classification-pill.accident-mode { background: rgba(255, 77, 109, 0.08); color: var(--action-rose); border: 1px solid rgba(255, 77, 109, 0.15); }
+        .matrix-body-row { display: grid; grid-template-columns: 2.5fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr; padding: 15px 25px; border-bottom: 1px solid var(--border-glow); align-items: center; animation: fadeIn 0.4s ease; }
+        .matrix-body-row.row-Finished { opacity: 0.35; background: rgba(0,0,0,0.25); border-left: 4px solid var(--action-green); }
+        .matrix-body-row.row-Paused { background: rgba(255, 183, 3, 0.01); border-left: 4px solid var(--action-amber); }
+        .matrix-body-row.row-Pending { border-left: 4px solid var(--action-cyan); }
+        .matrix-body-row.high-priority { background: rgba(255, 77, 109, 0.03); }
 
-        .technician-profile { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 600; }
-        .tech-avatar { width: 30px; height: 30px; background: rgba(255,255,255,0.04); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--action-cyan); border: 1px solid var(--border-glow); }
+        .job-identity-block h2 { font-size: 1.3rem; font-weight: 800; color: #fff; }
+        .job-identity-block p { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
         
-        .chrono-clock-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--action-green); }
+        .classification-pill { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; background: rgba(0, 180, 216, 0.08); color: var(--action-cyan); }
+        .classification-pill.accident-mode { background: rgba(255, 77, 109, 0.08); color: var(--action-rose); }
+
+        .chrono-clock-value { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; color: var(--action-green); }
         .chrono-clock-value.paused-text { color: var(--action-amber); }
         .chrono-clock-value.finished-text { color: #64748b; }
 
-        .status-badge-pill {
-            display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
-        }
-        .status-badge-pill.in-progress { background: rgba(6, 214, 160, 0.06); color: var(--action-green); border: 1px solid rgba(6, 214, 160, 0.15); }
-        .status-badge-pill.paused { background: rgba(255, 183, 3, 0.06); color: var(--action-amber); border: 1px solid rgba(255, 183, 3, 0.15); }
-        .status-badge-pill.terminated { background: rgba(71, 85, 105, 0.1); color: #94a3b8; border: 1px solid rgba(71, 85, 105, 0.2); }
+        .priority-indicator { font-weight: 800; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
+        .priority-indicator.flag-high { color: var(--action-rose); animation: pulse 1.5s infinite; }
 
-        /* FULLSCREEN LUNCH BREAK OVERLAY ELEMENT */
-        #lunchOverlayLayer {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #04050e; display: none; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999; text-align: center;
-        }
-        .lunch-title-hero { font-size: 6rem; font-weight: 900; letter-spacing: -2px; color: var(--action-amber); margin-bottom: 10px; text-transform: uppercase; }
-        .lunch-subtitle { font-size: 2rem; color: #94a3b8; font-weight: 500; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 4px; }
-        .lunch-countdown-display { font-family: 'JetBrains Mono', monospace; font-size: 12rem; font-weight: 700; color: #fff; text-shadow: 0 0 80px rgba(255,255,255,0.1); }
+        .ticker-container { background: #0b0c1f; border: 1px solid var(--border-glow); padding: 8px 20px; border-radius: 8px; font-size: 0.8rem; color: #94a3b8; overflow: hidden; white-space: nowrap; }
+        .ticker-wrap { display: inline-block; animation: marquee 25s linear infinite; }
+
+        #lunchOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #03040a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .lunch-title-hero { font-size: 5.5rem; font-weight: 900; color: var(--action-amber); text-transform: uppercase; letter-spacing: -1px; }
+        .lunch-countdown-display { font-family: 'JetBrains Mono', monospace; font-size: 11rem; font-weight: 700; color: #fff; margin-top: 10px; }
+
+        @keyframes marquee { 0% { transform: translate3d(100%, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
     <div id="lunchOverlayLayer">
         <div class="lunch-title-hero">🍱 LUNCH BREAK</div>
-        <div class="lunch-subtitle">Workshop Operations Suspended</div>
+        <div style="color: #64748b; font-weight: 700; font-size: 1.5rem; letter-spacing: 4px;">WORKSHOP OPERATIONS SUSPENDED</div>
         <div class="lunch-countdown-display" id="lunchCountdownClock">00:00</div>
     </div>
 
     <header>
         <div class="brand-block">
             <h1>GT AutoMech</h1>
-            <span>Production Execution System</span>
+            <span>Production Execution Matrix</span>
         </div>
         <div class="sys-meta-telemetry">
-            <div><div class="meta-node-title">System Node</div><div class="meta-node-value">BAY-MONITOR-01</div></div>
-            <div><div class="meta-node-title">Operational Link</div><div class="meta-node-value status-on">● ONLINE</div></div>
-            <div><div class="meta-node-title">Current Time</div><div class="meta-node-value" id="headerClockField">00:00:00 AM</div></div>
+            <div><div class="meta-node-title">Active Target Limit</div><div class="meta-node-value" style="color:var(--action-green)">8 VEHICLES MAX</div></div>
+            <div><div class="meta-node-title">Network Standby</div><div class="meta-node-value">● SECURE LINK</div></div>
+            <div><div class="meta-node-title">Current Clock Time</div><div class="meta-node-value" id="headerClockField">00:00:00 AM</div></div>
         </div>
     </header>
 
     <div class="metrics-row-grid">
-        <div class="metric-widget-card" style="--accent-line: var(--action-amber);"><div class="metric-meta-lbl">Active Repairs</div><div class="metric-counter-big" id="metricActiveVal">0</div></div>
-        <div class="metric-widget-card" style="--accent-line: var(--action-green);"><div class="metric-meta-lbl">Cleared Today</div><div class="metric-counter-big" id="metricClearedVal">0</div></div>
-        <div class="metric-widget-card" style="--accent-line: var(--action-cyan);"><div class="metric-meta-lbl">Service Rate</div><div class="metric-counter-big" id="metricRateVal">100%</div></div>
-        <div class="metric-widget-card" style="--accent-line: var(--action-rose);"><div class="metric-meta-lbl">Accident Bays</div><div class="metric-counter-big" id="metricAccidentVal">0</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-cyan);"><div class="metric-meta-lbl">Live Queue Run</div><div class="metric-counter-big" id="mActive">0</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-amber);"><div class="metric-meta-lbl">Bays Engaged</div><div class="metric-counter-big" id="mBays">0</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-rose);"><div class="metric-meta-lbl">Express Tracks</div><div class="metric-counter-big" id="mHigh">0</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-green);"><div class="metric-meta-lbl">Completed Today</div><div class="metric-counter-big" id="mDone">0</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-purple);"><div class="metric-meta-lbl">Yield Ratio</div><div class="metric-counter-big" id="mRatio">100%</div></div>
     </div>
 
     <div class="matrix-board-wrapper">
-        <div class="matrix-th-row">
-            <div>Vehicle Identification & Details</div>
-            <div>Classification</div>
-            <div>Assigned Technician</div>
-            <div>Production Track Chrono</div>
-            <div>Operation Status</div>
+        <div class="section-header-banner" style="color: var(--action-cyan); background: rgba(0,180,216,0.03);">
+            <span>⚡ Section I: Active Operational Diagnostics & Repairs</span>
+            <span id="countActiveSection">0 Units Listed</span>
         </div>
-        <div class="matrix-tbody-flow" id="tvQueueBody"></div>
+        <div class="matrix-th-row">
+            <div>Vehicle ID / Cloud Verification</div>
+            <div>Classification</div>
+            <div>Technical Station</div>
+            <div>Engineer</div>
+            <div>Production Chrono</div>
+            <div>Priority Level</div>
+        </div>
+        
+        <div class="matrix-tbody-flow" id="tvActiveQueueBody" style="max-height: 40vh;"></div>
+
+        <div class="section-header-banner" style="color: var(--action-green); background: rgba(6,214,160,0.03); border-top: 1px solid var(--border-glow);">
+            <span>🏁 Section II: Completed Log History (Cleared Clearance Records)</span>
+            <span id="countDoneSection">0 Units Finished</span>
+        </div>
+        
+        <div class="matrix-tbody-flow" id="tvCompletedQueueBody" style="max-height: 25vh; background: rgba(0,0,0,0.1);"></div>
+    </div>
+
+    <div class="ticker-container">
+        <div class="ticker-wrap" id="liveTickerText">
+            Notice: Ensure all digital job card files match hardware work order notes before finalizing terminal clearance signatures.
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -181,134 +146,134 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let tvIntervals = {};
-        let runningJobsCache = {};
-
+        let activeTimers = {};
+        
         setInterval(() => {
             document.getElementById("headerClockField").innerText = new Date().toLocaleTimeString();
         }, 1000);
 
-        // 1. LISTEN TO SYSTEM GLOBAL LUNCH BREAK OVERLAY
-        let lunchTimerInterval = null;
+        // LUNCH OVERLAY WITH SELF-TERMINATING END ACTION
+        let lunchCountdownEngine = null;
         db.collection("system_state").doc("lunch_break").onSnapshot((doc) => {
             const data = doc.data();
-            const overlay = document.getElementById("lunchOverlayLayer");
-            if (lunchTimerInterval) clearInterval(lunchTimerInterval);
+            const layer = document.getElementById("lunchOverlayLayer");
+            if (lunchCountdownEngine) clearInterval(lunchCountdownEngine);
 
             if (data && data.active === true) {
-                overlay.style.display = "flex";
-                
-                const durationMs = data.duration * 60 * 1000;
-                const startBreakTime = data.timestamp ? data.timestamp.toDate() : new Date();
+                layer.style.display = "flex";
+                const totalDurationMs = data.duration * 60 * 1000;
+                const startingPoint = data.timestamp ? data.timestamp.toDate() : new Date();
 
-                lunchTimerInterval = setInterval(() => {
-                    const elapsed = new Date() - startBreakTime;
-                    const remainingMs = durationMs - elapsed;
+                lunchCountdownEngine = setInterval(() => {
+                    const elapsed = new Date() - startingPoint;
+                    const dynamicRemaining = totalDurationMs - elapsed;
 
-                    if (remainingMs <= 0) {
+                    if (dynamicRemaining <= 0) {
+                        clearInterval(lunchCountdownEngine);
                         document.getElementById("lunchCountdownClock").innerText = "00:00";
-                        clearInterval(lunchTimerInterval);
+                        // AUTO KILL LUNCH BREAK SYSTEM STATE RECORD
+                        db.collection("system_state").doc("lunch_break").update({ active: false });
                     } else {
-                        const totalSecs = Math.floor(remainingMs / 1000);
-                        const mins = String(Math.floor(totalSecs / 60)).padStart(2, '0');
-                        const secs = String(totalSecs % 60).padStart(2, '0');
-                        document.getElementById("lunchCountdownClock").innerText = `${mins}:${secs}`;
+                        const secondsLeft = Math.floor(dynamicRemaining / 1000);
+                        const m = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+                        const s = String(secondsLeft % 60).padStart(2, '0');
+                        document.getElementById("lunchCountdownClock").innerText = `${m}:${s}`;
                     }
                 }, 1000);
             } else {
-                overlay.style.display = "none";
+                layer.style.display = "none";
             }
         });
 
-        // 2. LISTEN TO ANALYTICS CARD HOOKS
-        db.collection("pending_jobs").onSnapshot((snapshot) => {
-            let active = 0, accident = 0, finished = 0;
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if(data.status === "Pending" || data.status === "Paused") {
-                    active++;
-                    if((data.jobType || "").toLowerCase().includes("accident")) accident++;
-                } else if(data.status === "Finished") {
-                    finished++;
-                }
-            });
-            document.getElementById("metricActiveVal").innerText = active;
-            document.getElementById("metricAccidentVal").innerText = accident;
-            document.getElementById("metricClearedVal").innerText = finished;
-            const rate = (active + finished) > 0 ? Math.round((finished / (active + finished)) * 100) : 100;
-            document.getElementById("metricRateVal").innerText = `${rate}%`;
-        });
-
-        // 3. MAIN INTERFACE QUEUE SYNC WITH TIMERS
+        // LIVE MATRIX COMPUTATION SYNC FEED
         db.collection("pending_jobs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-            const body = document.getElementById("tvQueueBody");
-            body.innerHTML = "";
+            const activeContainer = document.getElementById("tvActiveQueueBody");
+            const completedContainer = document.getElementById("tvCompletedQueueBody");
             
-            for (let key in tvIntervals) { clearInterval(tvIntervals[key]); }
-            tvIntervals = {};
-            runningJobsCache = {};
+            activeContainer.innerHTML = "";
+            completedContainer.innerHTML = "";
+
+            for (let k in activeTimers) { clearInterval(activeTimers[k]); }
+            activeTimers = {};
+
+            let tallyActive = 0, tallyDone = 0, tallyHigh = 0;
+            let engagedBays = new Set();
 
             snapshot.forEach((doc) => {
                 const job = doc.data();
                 const id = doc.id;
-                runningJobsCache[id] = job;
+                const isAccident = (job.jobType || "").toLowerCase().includes("accident");
                 
-                const typeText = job.jobType || "General Service";
-                const isAccident = typeText.toLowerCase().includes("accident");
-                const initialLetter = job.technician ? job.technician.trim().charAt(0).toUpperCase() : "?";
-
-                const row = document.createElement("div");
-                row.className = `matrix-body-row row-${job.status}`;
-                
-                let statusLabel = `⚙️ In Progress`;
-                let timerClass = "";
-                if(job.status === "Paused") {
-                    statusLabel = `⏸️ Paused`;
-                    timerClass = "paused-text";
-                } else if(job.status === "Finished") {
-                    statusLabel = `🏁 Terminated`;
-                    timerClass = "finished-text";
+                // Track Telemetry Stats
+                if (job.status !== "Finished") {
+                    tallyActive++;
+                    if(job.priority === "High") tallyHigh++;
+                    if(job.bay) engagedBays.add(job.bay);
+                } else {
+                    tallyDone++;
                 }
+
+                // Create Row Element
+                const row = document.createElement("div");
+                row.className = `matrix-body-row row-${job.status} ${job.priority === 'High' ? 'high-priority' : ''}`;
+                
+                let timeColorClass = "";
+                if(job.status === "Paused") timeColorClass = "paused-text";
+                if(job.status === "Finished") timeColorClass = "finished-text";
 
                 row.innerHTML = `
                     <div class="job-identity-block">
-                        <h2>${job.vehicle || "Untitled"}</h2>
-                        <span>ID: ${id.substring(0, 6).toUpperCase()} • Live Dataport</span>
+                        <h2>${job.vehicle}</h2>
+                        <p>UUID: ${id.substring(0,8).toUpperCase()} • verified</p>
                     </div>
-                    <div><span class="classification-pill ${isAccident ? 'accident-mode' : ''}">${typeText}</span></div>
-                    <div class="technician-profile">
-                        <div class="tech-avatar">${initialLetter}</div>
-                        <div>${job.technician || "Unassigned"}</div>
-                    </div>
-                    <div class="chrono-clock-value ${timerClass}" id="tv-timer-${id}">00:00:00</div>
-                    <div><span class="status-badge-pill ${job.status === 'Pending' ? 'in-progress' : job.status === 'Paused' ? 'paused' : 'terminated'}">${statusLabel}</span></div>
+                    <div><span class="classification-pill ${isAccident ? 'accident-mode' : ''}">${job.jobType || 'General'}</span></div>
+                    <div style="font-weight:600; color:#cbd5e1;">${job.bay || 'Main Floor'}</div>
+                    <div style="font-weight:500;">👤 ${job.technician}</div>
+                    <div class="chrono-clock-value ${timeColorClass}" id="timer-${id}">00:00:00</div>
+                    <div class="priority-indicator ${job.priority === 'High' ? 'flag-high' : ''}">${job.priority || 'Normal'}</div>
                 `;
-                
-                body.appendChild(row);
 
-                // CHRONO TIMER COMPUTATION CONTROLLER
-                const createdTime = job.timestamp ? job.timestamp.toDate() : new Date();
+                // CRITICAL STRUCTURAL SPLIT: UPPER SECTION VS LOWER COMPLETED HISTORIC SECTION
+                if (job.status === "Finished") {
+                    completedContainer.appendChild(row);
+                } else {
+                    activeContainer.appendChild(row);
+                }
+
+                // FIXED LIVE DURATION MATRIX CLOCK COMPILER ENGINE
+                const initializedTime = job.timestamp ? job.timestamp.toDate() : new Date();
                 
-                tvIntervals[id] = setInterval(() => {
-                    let totalElapsedSeconds = 0;
+                activeTimers[id] = setInterval(() => {
+                    let calculatedLiveSeconds = 0;
 
                     if (job.status === "Pending") {
-                        const previousAccumulated = job.pausedDuration || 0;
-                        const lastChange = job.lastStatusChange ? job.lastStatusChange.toDate() : createdTime;
-                        const sinceLastChange = Math.floor((new Date() - lastChange) / 1000);
-                        totalElapsedSeconds = previousAccumulated + sinceLastChange;
+                        const previousLockedSegment = job.pausedDuration || 0;
+                        const lastInteractionMarker = job.lastStatusChange ? job.lastStatusChange.toDate() : initializedTime;
+                        const rollingSessionSeconds = Math.floor((new Date() - lastInteractionMarker) / 1000);
+                        calculatedLiveSeconds = previousLockedSegment + rollingSessionSeconds;
                     } else {
-                        totalElapsedSeconds = job.pausedDuration || 0;
+                        // If paused or completed, display frozen state cleanly without resetting to zero
+                        calculatedLiveSeconds = job.pausedDuration || 0;
                     }
 
-                    const h = String(Math.floor(totalElapsedSeconds / 3600)).padStart(2, '0');
-                    const m = String(Math.floor((totalElapsedSeconds % 3600) / 60)).padStart(2, '0');
-                    const s = String(totalElapsedSeconds % 60).padStart(2, '0');
+                    const hr = String(Math.floor(calculatedLiveSeconds / 3600)).padStart(2, '0');
+                    const mn = String(Math.floor((calculatedLiveSeconds % 3600) / 60)).padStart(2, '0');
+                    const sc = String(calculatedLiveSeconds % 60).padStart(2, '0');
                     
-                    const timerEl = document.getElementById(`tv-timer-${id}`);
-                    if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
+                    const el = document.getElementById(`timer-${id}`);
+                    if (el) el.innerText = `${hr}:${mn}:${sc}`;
                 }, 1000);
             });
+
+            // Update Screen Counters
+            document.getElementById("mActive").innerText = tallyActive;
+            document.getElementById("mBays").innerText = engagedBays.size;
+            document.getElementById("mHigh").innerText = tallyHigh;
+            document.getElementById("mDone").innerText = tallyDone;
+            document.getElementById("mRatio").innerText = (tallyActive + tallyDone) > 0 ? Math.round((tallyDone / (tallyActive + tallyDone)) * 100) + '%' : '100%';
+            
+            document.getElementById("countActiveSection").innerText = `${tallyActive} Units Tracked`;
+            document.getElementById("countDoneSection").innerText = `${tallyDone} Units Closed`;
         });
     </script>
 </body>
