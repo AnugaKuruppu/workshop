@@ -50,7 +50,6 @@
         .multiselect-option:hover { background: rgba(0, 180, 216, 0.1); }
         .multiselect-option input { cursor: pointer; width: auto; margin: 0; }
 
-        /* Tech Search Bar Styling */
         .dropdown-search-box { position: sticky; top: 0; background: #0f1126; padding: 10px; z-index: 10; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .dropdown-search-box input { width: 100%; padding: 8px 10px; font-size: 0.8rem; border-color: rgba(0, 180, 216, 0.4); }
         .dropdown-search-box input:focus { outline: none; border-color: var(--action-cyan); }
@@ -298,7 +297,6 @@
             document.getElementById("techDropdown").classList.toggle("show");
             document.getElementById("classificationDropdown").classList.remove("show");
             
-            // Auto-focus search input when opening
             if(document.getElementById("techDropdown").classList.contains("show")) {
                 setTimeout(() => document.getElementById("techSearchInput").focus(), 50);
             }
@@ -419,7 +417,6 @@
             document.querySelectorAll('#techDropdown input').forEach(cb => cb.checked = false);
             updateTechLabel();
 
-            // Clear Technician search bar on reset
             const searchInput = document.getElementById("techSearchInput");
             if (searchInput) {
                 searchInput.value = "";
@@ -606,10 +603,22 @@
                 }
                 actionControls += `<button class="btn-danger" onclick="deleteJob('${job.id}')">🗑️</button>`;
 
+                // Extract and format the permanent start time
+                let formattedStartTime = "Syncing...";
+                if (job.timestamp) {
+                    const d = job.timestamp.toDate();
+                    const hrs = d.getHours() % 12 || 12;
+                    const mins = String(d.getMinutes()).padStart(2, '0');
+                    const ampm = d.getHours() >= 12 ? 'PM' : 'AM';
+                    const month = d.toLocaleString('en-US', { month: 'short' });
+                    const day = d.getDate();
+                    formattedStartTime = `${month} ${day}, ${hrs}:${mins} ${ampm}`;
+                }
+
                 card.innerHTML = `
                     <div class="node-meta" style="flex:1; padding-right:15px;">
                         <h3>${job.vehicle} <span class="badge ${job.status?.toLowerCase()}">${job.status}</span></h3>
-                        <p><strong>${job.jobType}</strong> | Tech: ${job.technician}</p>
+                        <p><strong>${job.jobType}</strong> | Tech: ${job.technician} | 🕒 Started: ${formattedStartTime}</p>
                         ${job.notes ? `<div class="node-notes">${job.notes}</div>` : ''}
                     </div>
                     <div class="node-actions">${actionControls}</div>
