@@ -154,6 +154,7 @@
         let initialLoadComplete = false;
         let runningJobStates = {}; 
         let finishedJobsList = []; 
+        let isLunchBreakActive = false;
         
         setInterval(() => {
             const now = new Date();
@@ -181,13 +182,15 @@
             
             if (rotationTimer) clearInterval(rotationTimer);
             rotationTimer = setInterval(() => {
-                if (finishedJobsList.length > 0) {
+                if (finishedJobsList.length > 0 && !isLunchBreakActive) {
                     triggerFullScreenListDisplay();
                 }
             }, settings.frequency * 60 * 1000);
         });
 
         function triggerFullScreenListDisplay() {
+            if (isLunchBreakActive) return;
+
             const layer = document.getElementById("jobFinishedOverlayLayer");
             const container = document.getElementById("finishedListContainer");
             container.innerHTML = "";
@@ -224,6 +227,7 @@
             if (lunchCountdownEngine) clearInterval(lunchCountdownEngine);
 
             if (data && data.active === true) {
+                isLunchBreakActive = true;
                 layer.style.display = "flex";
                 const totalDurationMs = data.duration * 60 * 1000;
                 const startingPoint = data.timestamp ? data.timestamp.toDate() : new Date();
@@ -244,6 +248,7 @@
                     }
                 }, 1000);
             } else {
+                isLunchBreakActive = false;
                 layer.style.display = "none";
             }
         });
@@ -268,7 +273,7 @@
                     tallyDone++;
                     finishedJobsList.push(job); 
 
-                    if (initialLoadComplete && runningJobStates[id] && runningJobStates[id] !== "Finished") {
+                    if (initialLoadComplete && runningJobStates[id] && runningJobStates[id] !== "Finished" && !isLunchBreakActive) {
                         triggerFullScreenListDisplay(); 
                     }
                     return; 
