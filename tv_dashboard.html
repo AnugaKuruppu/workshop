@@ -33,7 +33,7 @@
         .meta-node-title { font-size: 0.65rem; color: #64748b; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         .meta-node-value { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #e2e8f0; }
 
-        .metrics-row-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .metrics-row-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .metric-widget-card { background: var(--bg-card); border: 1px solid var(--border-glow); border-left: 4px solid var(--accent-line, var(--action-cyan)); border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .metric-meta-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
         .metric-counter-big { font-size: 2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono'; }
@@ -41,10 +41,10 @@
         .matrix-board-wrapper { background: var(--bg-panel); backdrop-filter: blur(30px); border: 1px solid var(--border-glow); border-radius: 14px; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
         .section-header-banner { background: rgba(255,255,255,0.02); padding: 10px 25px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-glow); display: flex; justify-content: space-between; }
         
-        .matrix-th-row { display: grid; grid-template-columns: 2.5fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr; padding: 12px 25px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-glow); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
+        .matrix-th-row { display: grid; grid-template-columns: 2.5fr 2fr 2fr 2fr 1.5fr; padding: 12px 25px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-glow); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; }
         .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; flex-grow: 1; }
         
-        .matrix-body-row { display: grid; grid-template-columns: 2.5fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr; padding: 15px 25px; border-bottom: 1px solid var(--border-glow); align-items: center; animation: fadeIn 0.4s ease; }
+        .matrix-body-row { display: grid; grid-template-columns: 2.5fr 2fr 2fr 2fr 1.5fr; padding: 15px 25px; border-bottom: 1px solid var(--border-glow); align-items: center; animation: fadeIn 0.4s ease; }
         .matrix-body-row.row-Finished { opacity: 0.35; background: rgba(0,0,0,0.25); border-left: 4px solid var(--action-green); }
         .matrix-body-row.row-Paused { background: rgba(255, 183, 3, 0.01); border-left: 4px solid var(--action-amber); }
         .matrix-body-row.row-Pending { border-left: 4px solid var(--action-cyan); }
@@ -53,7 +53,7 @@
         .job-identity-block h2 { font-size: 1.3rem; font-weight: 800; color: #fff; }
         .job-identity-block p { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
         
-        .classification-pill { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; background: rgba(0, 180, 216, 0.08); color: var(--action-cyan); }
+        .classification-pill { inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; background: rgba(0, 180, 216, 0.08); color: var(--action-cyan); }
         .classification-pill.accident-mode { background: rgba(255, 77, 109, 0.08); color: var(--action-rose); }
 
         .chrono-clock-value { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; color: var(--action-green); }
@@ -96,7 +96,6 @@
 
     <div class="metrics-row-grid">
         <div class="metric-widget-card" style="--accent-line: var(--action-cyan);"><div class="metric-meta-lbl">Live Queue Run</div><div class="metric-counter-big" id="mActive">0</div></div>
-        <div class="metric-widget-card" style="--accent-line: var(--action-amber);"><div class="metric-meta-lbl">Bays Engaged</div><div class="metric-counter-big" id="mBays">0</div></div>
         <div class="metric-widget-card" style="--accent-line: var(--action-rose);"><div class="metric-meta-lbl">Express Tracks</div><div class="metric-counter-big" id="mHigh">0</div></div>
         <div class="metric-widget-card" style="--accent-line: var(--action-green);"><div class="metric-meta-lbl">Completed Today</div><div class="metric-counter-big" id="mDone">0</div></div>
         <div class="metric-widget-card" style="--accent-line: var(--action-purple);"><div class="metric-meta-lbl">Yield Ratio</div><div class="metric-counter-big" id="mRatio">100%</div></div>
@@ -110,7 +109,6 @@
         <div class="matrix-th-row">
             <div>Vehicle ID / Cloud Verification</div>
             <div>Classification</div>
-            <div>Technical Station</div>
             <div>Engineer</div>
             <div>Production Chrono</div>
             <div>Priority Level</div>
@@ -152,7 +150,6 @@
             document.getElementById("headerClockField").innerText = new Date().toLocaleTimeString();
         }, 1000);
 
-        // LUNCH OVERLAY WITH SELF-TERMINATING END ACTION
         let lunchCountdownEngine = null;
         db.collection("system_state").doc("lunch_break").onSnapshot((doc) => {
             const data = doc.data();
@@ -171,7 +168,6 @@
                     if (dynamicRemaining <= 0) {
                         clearInterval(lunchCountdownEngine);
                         document.getElementById("lunchCountdownClock").innerText = "00:00";
-                        // AUTO KILL LUNCH BREAK SYSTEM STATE RECORD
                         db.collection("system_state").doc("lunch_break").update({ active: false });
                     } else {
                         const secondsLeft = Math.floor(dynamicRemaining / 1000);
@@ -185,7 +181,6 @@
             }
         });
 
-        // LIVE MATRIX COMPUTATION SYNC FEED
         db.collection("pending_jobs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const activeContainer = document.getElementById("tvActiveQueueBody");
             const completedContainer = document.getElementById("tvCompletedQueueBody");
@@ -197,23 +192,22 @@
             activeTimers = {};
 
             let tallyActive = 0, tallyDone = 0, tallyHigh = 0;
-            let engagedBays = new Set();
 
             snapshot.forEach((doc) => {
                 const job = doc.data();
                 const id = doc.id;
-                const isAccident = (job.jobType || "").toLowerCase().includes("accident");
                 
-                // Track Telemetry Stats
+                // Highlight color rule updates
+                const typeLower = (job.jobType || "").toLowerCase();
+                const isCriticalTrack = typeLower.includes("body shop") || typeLower.includes("ac repair");
+                
                 if (job.status !== "Finished") {
                     tallyActive++;
                     if(job.priority === "High") tallyHigh++;
-                    if(job.bay) engagedBays.add(job.bay);
                 } else {
                     tallyDone++;
                 }
 
-                // Create Row Element
                 const row = document.createElement("div");
                 row.className = `matrix-body-row row-${job.status} ${job.priority === 'High' ? 'high-priority' : ''}`;
                 
@@ -226,21 +220,18 @@
                         <h2>${job.vehicle}</h2>
                         <p>UUID: ${id.substring(0,8).toUpperCase()} • verified</p>
                     </div>
-                    <div><span class="classification-pill ${isAccident ? 'accident-mode' : ''}">${job.jobType || 'General'}</span></div>
-                    <div style="font-weight:600; color:#cbd5e1;">${job.bay || 'Main Floor'}</div>
+                    <div><span class="classification-pill ${isCriticalTrack ? 'accident-mode' : ''}">${job.jobType || 'General'}</span></div>
                     <div style="font-weight:500;">👤 ${job.technician}</div>
                     <div class="chrono-clock-value ${timeColorClass}" id="timer-${id}">00:00:00</div>
                     <div class="priority-indicator ${job.priority === 'High' ? 'flag-high' : ''}">${job.priority || 'Normal'}</div>
                 `;
 
-                // CRITICAL STRUCTURAL SPLIT: UPPER SECTION VS LOWER COMPLETED HISTORIC SECTION
                 if (job.status === "Finished") {
                     completedContainer.appendChild(row);
                 } else {
                     activeContainer.appendChild(row);
                 }
 
-                // FIXED LIVE DURATION MATRIX CLOCK COMPILER ENGINE
                 const initializedTime = job.timestamp ? job.timestamp.toDate() : new Date();
                 
                 activeTimers[id] = setInterval(() => {
@@ -252,7 +243,6 @@
                         const rollingSessionSeconds = Math.floor((new Date() - lastInteractionMarker) / 1000);
                         calculatedLiveSeconds = previousLockedSegment + rollingSessionSeconds;
                     } else {
-                        // If paused or completed, display frozen state cleanly without resetting to zero
                         calculatedLiveSeconds = job.pausedDuration || 0;
                     }
 
@@ -265,9 +255,7 @@
                 }, 1000);
             });
 
-            // Update Screen Counters
             document.getElementById("mActive").innerText = tallyActive;
-            document.getElementById("mBays").innerText = engagedBays.size;
             document.getElementById("mHigh").innerText = tallyHigh;
             document.getElementById("mDone").innerText = tallyDone;
             document.getElementById("mRatio").innerText = (tallyActive + tallyDone) > 0 ? Math.round((tallyDone / (tallyActive + tallyDone)) * 100) + '%' : '100%';
