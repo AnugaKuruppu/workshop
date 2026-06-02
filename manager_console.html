@@ -44,11 +44,16 @@
         textarea { resize: none; height: 70px; }
 
         .multiselect-box { background: #13152e; border: 1px solid var(--border-glow); border-radius: 6px; cursor: pointer; padding: 10px; font-size: 0.9rem; user-select: none; display: flex; justify-content: space-between; align-items: center; }
-        .multiselect-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #0f1126; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; margin-top: 4px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .multiselect-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #0f1126; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; margin-top: 4px; max-height: 250px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .multiselect-dropdown.show { display: block; }
         .multiselect-option { padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
         .multiselect-option:hover { background: rgba(0, 180, 216, 0.1); }
         .multiselect-option input { cursor: pointer; width: auto; margin: 0; }
+
+        /* Tech Search Bar Styling */
+        .dropdown-search-box { position: sticky; top: 0; background: #0f1126; padding: 10px; z-index: 10; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .dropdown-search-box input { width: 100%; padding: 8px 10px; font-size: 0.8rem; border-color: rgba(0, 180, 216, 0.4); }
+        .dropdown-search-box input:focus { outline: none; border-color: var(--action-cyan); }
 
         button { padding: 10px 15px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-primary { background: var(--action-cyan); color: #fff; width: 100%; }
@@ -134,31 +139,34 @@
                         <span>▼</span>
                     </div>
                     <div class="multiselect-dropdown" id="techDropdown">
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Malith"> Malith</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Tharusha"> Tharusha</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Dananja"> Dananja</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nimesh"> Nimesh</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Dilan"> Dilan</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sudanka"> Sudanka</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sudesh"> Sudesh</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Thilina"> Thilina</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Madushan"> Madushan</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Udesh"> Udesh</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Heshan"> Heshan</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nipuna"> Nipuna</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Malshan"> Malshan</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sathsara"> Sathsara</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sonal"> Sonal</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nisal"> Nisal</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Imalsha"> Imalsha</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nuwan"> Nuwan</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sandaru"> Sandaru</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Hirushan"> Hirushan</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Mahesh"> Mahesh</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sachith"> Sachith</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Kavindu"> Kavindu</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Yohan"> Yohan</div>
-                        <div class="multiselect-option" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Kesara"> Kesara</div>
+                        <div class="dropdown-search-box" onclick="event.stopPropagation()">
+                            <input type="text" id="techSearchInput" placeholder="🔍 Search Tech Name..." oninput="filterTechnicians()">
+                        </div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Malith"> Malith</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Tharusha"> Tharusha</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Dananja"> Dananja</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nimesh"> Nimesh</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Dilan"> Dilan</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sudanka"> Sudanka</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sudesh"> Sudesh</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Thilina"> Thilina</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Madushan"> Madushan</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Udesh"> Udesh</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Heshan"> Heshan</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nipuna"> Nipuna</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Malshan"> Malshan</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sathsara"> Sathsara</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sonal"> Sonal</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nisal"> Nisal</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Imalsha"> Imalsha</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Nuwan"> Nuwan</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sandaru"> Sandaru</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Hirushan"> Hirushan</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Mahesh"> Mahesh</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Sachith"> Sachith</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Kavindu"> Kavindu</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Yohan"> Yohan</div>
+                        <div class="multiselect-option tech-opt" onclick="handleTechOptionClick(this)"><input type="checkbox" value="Kesara"> Kesara</div>
                     </div>
                 </div>
 
@@ -289,6 +297,25 @@
             e.stopPropagation();
             document.getElementById("techDropdown").classList.toggle("show");
             document.getElementById("classificationDropdown").classList.remove("show");
+            
+            // Auto-focus search input when opening
+            if(document.getElementById("techDropdown").classList.contains("show")) {
+                setTimeout(() => document.getElementById("techSearchInput").focus(), 50);
+            }
+        }
+
+        function filterTechnicians() {
+            const filter = document.getElementById("techSearchInput").value.toLowerCase();
+            const options = document.querySelectorAll('#techDropdown .tech-opt');
+            
+            options.forEach(option => {
+                const text = option.textContent || option.innerText;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    option.style.display = "flex";
+                } else {
+                    option.style.display = "none";
+                }
+            });
         }
 
         function handleTechOptionClick(optionDiv) {
@@ -316,7 +343,6 @@
         document.getElementById("classificationDropdown").addEventListener('click', (e) => { e.stopPropagation(); });
         document.getElementById("techDropdown").addEventListener('click', (e) => { e.stopPropagation(); });
 
-        // Subscribe to live rotation configurations
         db.collection("system_state").doc("rotation_settings").onSnapshot(doc => {
             if (doc.exists) {
                 const d = doc.data();
@@ -392,6 +418,13 @@
             
             document.querySelectorAll('#techDropdown input').forEach(cb => cb.checked = false);
             updateTechLabel();
+
+            // Clear Technician search bar on reset
+            const searchInput = document.getElementById("techSearchInput");
+            if (searchInput) {
+                searchInput.value = "";
+                filterTechnicians();
+            }
 
             document.getElementById("dispatchFormTitle").innerText = "Dispatch Control";
             document.getElementById("dispatchSubmitBtn").innerText = "🚀 Dispatch Job Card";
