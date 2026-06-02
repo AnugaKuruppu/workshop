@@ -20,11 +20,13 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg-base); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow: hidden; }
+        
+        body { background-color: var(--bg-base); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow: hidden; }
 
         header {
             display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel);
             backdrop-filter: blur(30px); border: 1px solid var(--border-glow); padding: 15px 30px; border-radius: 12px;
+            flex-shrink: 0;
         }
         .brand-block h1 { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; }
         .brand-block span { color: var(--action-cyan); font-weight: 700; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
@@ -33,22 +35,22 @@
         .meta-node-title { font-size: 0.65rem; color: #64748b; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         .meta-node-value { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: #e2e8f0; }
 
-        .metrics-row-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .metrics-row-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; flex-shrink: 0; }
         .metric-widget-card { background: var(--bg-card); border: 1px solid var(--border-glow); border-left: 4px solid var(--accent-line, var(--action-cyan)); border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .metric-meta-lbl { font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
         .metric-counter-big { font-size: 2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono'; }
 
-        /* Board layout styling explicitly defined with pixel-accurate constraints for scrolling */
-        .matrix-board-wrapper { background: var(--bg-panel); backdrop-filter: blur(30px); border: 1px solid var(--border-glow); border-radius: 14px; display: flex; flex-direction: column; height: 58vh; min-height: 400px; overflow: hidden; position: relative; }
+        .matrix-board-wrapper { flex: 1; min-height: 0; background: var(--bg-panel); backdrop-filter: blur(30px); border: 1px solid var(--border-glow); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         .section-header-banner { background: rgba(255,255,255,0.02); padding: 10px 25px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-glow); display: flex; justify-content: space-between; flex-shrink: 0; }
         
-        .matrix-th-row { display: grid; grid-template-columns: 2.5fr 2fr 2fr 2fr 1.5fr; padding: 12px 25px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-glow); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; flex-shrink: 0; }
+        /* Updated to 6 Columns to fit the Started At info */
+        .matrix-th-row { display: grid; grid-template-columns: 2.2fr 1.8fr 1.8fr 1.5fr 1.5fr 1.2fr; padding: 12px 25px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-glow); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; flex-shrink: 0; }
         
-        /* Fixed scroll box container for Section 1 */
-        .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; flex-grow: 1; -ms-overflow-style: none; scrollbar-width: none; position: relative; height: 100%; }
+        .matrix-tbody-flow { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; -ms-overflow-style: none; scrollbar-width: none; padding-bottom: 10px; }
         .matrix-tbody-flow::-webkit-scrollbar { display: none; }
         
-        .matrix-body-row { display: grid; grid-template-columns: 2.5fr 2fr 2fr 2fr 1.5fr; padding: 15px 25px; border-bottom: 1px solid var(--border-glow); align-items: center; animation: fadeIn 0.4s ease; flex-shrink: 0; }
+        /* Updated to 6 Columns to fit the Started At info */
+        .matrix-body-row { display: grid; grid-template-columns: 2.2fr 1.8fr 1.8fr 1.5fr 1.5fr 1.2fr; padding: 15px 25px; border-bottom: 1px solid var(--border-glow); align-items: center; animation: fadeIn 0.4s ease; flex-shrink: 0; }
         .matrix-body-row.row-Paused { background: rgba(255, 183, 3, 0.01); border-left: 4px solid var(--action-amber); }
         .matrix-body-row.row-Pending { border-left: 4px solid var(--action-cyan); }
         .matrix-body-row.high-priority { background: rgba(255, 77, 109, 0.03); }
@@ -65,10 +67,9 @@
         .priority-indicator { font-weight: 800; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
         .priority-indicator.flag-high { color: var(--action-rose); animation: pulse 1.5s infinite; }
 
-        .ticker-container { background: #0b0c1f; border: 1px solid var(--border-glow); padding: 8px 20px; border-radius: 8px; font-size: 0.8rem; color: #94a3b8; overflow: hidden; white-space: nowrap; margin-top: auto; }
+        .ticker-container { flex-shrink: 0; background: #0b0c1f; border: 1px solid var(--border-glow); padding: 8px 20px; border-radius: 8px; font-size: 0.8rem; color: #94a3b8; overflow: hidden; white-space: nowrap; }
         .ticker-wrap { display: inline-block; animation: marquee 25s linear infinite; }
 
-        /* Full Screen List Overlay for Completed Jobs */
         #jobFinishedOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 4, 10, 0.98); backdrop-filter: blur(15px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10005; animation: fadeIn 0.3s ease forwards; padding: 40px; }
         .finished-title-hero { font-size: 4rem; font-weight: 900; color: var(--action-green); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; text-align: center; }
         .finished-list-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; max-width: 1600px; max-height: 75vh; overflow-y: auto; align-content: flex-start; }
@@ -126,6 +127,7 @@
             <div>Vehicle ID / Cloud Verification</div>
             <div>Classification</div>
             <div>Technician</div>
+            <div>Started At</div>
             <div>Production Chrono</div>
             <div>Priority Level</div>
         </div>
@@ -159,59 +161,58 @@
         let finishedJobsList = []; 
         let isLunchBreakActive = false;
         
-        // Configuration fields matching the Console
         let configuredScrollSpeed = 60; 
         let rotationPreviewAllowed = true; 
 
-        // Live Clock Tick & Daily Auto Reset Engine
+        // Live Clock Tick ONLY (The midnight auto-wipe logic has been removed to permanently save data)
         setInterval(() => {
             const now = new Date();
             document.getElementById("headerClockField").innerText = now.toLocaleTimeString();
-            
-            const currentStringDate = now.toDateString();
-            db.collection("system_state").doc("calendar_tracking").get().then((doc) => {
-                if (!doc.exists) {
-                    db.collection("system_state").doc("calendar_tracking").set({ lastDate: currentStringDate });
-                } else if (doc.data().lastDate !== currentStringDate) {
-                    db.collection("system_state").doc("calendar_tracking").set({ lastDate: currentStringDate });
-                    db.collection("pending_jobs").get().then((snap) => {
-                        snap.forEach((documentLog) => { documentLog.ref.delete(); });
-                    });
-                }
-            });
         }, 1000);
 
-        // -- CALIBRATED AUTO SCROLL ENGINE --
+        // ==========================================
+        //  RE-WRITTEN MATHEMATICAL AUTO SCROLL ENGINE
+        // ==========================================
         let autoScrollEngine = null;
         let isScrollingPaused = false;
+        let exactMathematicalScrollTop = 0; 
 
         function runQueueAutoScroll() {
             const container = document.getElementById("tvActiveQueueBody");
             if (autoScrollEngine) clearInterval(autoScrollEngine);
             
-            // If configured scroll speed value is set to 0, completely abort loop
             if (configuredScrollSpeed <= 0) return;
+
+            exactMathematicalScrollTop = container.scrollTop;
 
             autoScrollEngine = setInterval(() => {
                 if (isScrollingPaused) return;
 
-                // If content does not overflow container limits, bypass scroll incrementation
-                if (container.scrollHeight <= container.clientHeight) return;
+                const maxScroll = container.scrollHeight - container.clientHeight;
+                
+                if (maxScroll <= 0) return; 
 
-                // Threshold cross detection to trace when bottom bounds match scroll level
-                if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
+                if (exactMathematicalScrollTop >= maxScroll - 1) { 
                     isScrollingPaused = true;
                     setTimeout(() => {
                         container.scrollTo({ top: 0, behavior: 'smooth' }); 
-                        setTimeout(() => { isScrollingPaused = false; }, 2000);
+                        
+                        setTimeout(() => { 
+                            exactMathematicalScrollTop = 0; 
+                            isScrollingPaused = false; 
+                        }, 2000); 
+                        
                     }, 2500); 
                 } else {
-                    container.scrollTop += 1; 
+                    exactMathematicalScrollTop += 1;
+                    container.scrollTop = exactMathematicalScrollTop;
                 }
             }, configuredScrollSpeed); 
         }
 
-        // -- LIST ROTATION LOGIC --
+        // ==========================================
+        //  LIST ROTATION LOGIC 
+        // ==========================================
         let rotationTimer = null;
         let overlayTimeout = null;
 
@@ -221,12 +222,10 @@
             configuredScrollSpeed = settings.scrollSpeed !== undefined ? settings.scrollSpeed : 60;
             rotationPreviewAllowed = settings.previewEnabled !== undefined ? settings.previewEnabled : true;
             
-            // Re-initialize scroll configuration mapping
             runQueueAutoScroll();
 
             if (rotationTimer) clearInterval(rotationTimer);
             rotationTimer = setInterval(() => {
-                // Intercept execution tracking if user disabled the preview or break is active
                 if (finishedJobsList.length > 0 && !isLunchBreakActive && rotationPreviewAllowed) {
                     triggerFullScreenListDisplay();
                 }
@@ -267,7 +266,9 @@
             });
         }
 
-        // -- LUNCH BREAK TRACKING --
+        // ==========================================
+        //  LUNCH BREAK TRACKING 
+        // ==========================================
         let lunchCountdownEngine = null;
         db.collection("system_state").doc("lunch_break").onSnapshot((doc) => {
             const data = doc.data();
@@ -278,7 +279,6 @@
                 isLunchBreakActive = true;
                 layer.style.display = "flex";
                 
-                // Hide finished board instantly if a break cuts in
                 document.getElementById("jobFinishedOverlayLayer").style.display = "none";
                 
                 const totalDurationMs = data.duration * 60 * 1000;
@@ -305,7 +305,9 @@
             }
         });
 
-        // -- DATA SNAPSHOT STREAM & LIVE INTERFACE AGENT --
+        // ==========================================
+        //  DATA SNAPSHOT STREAM 
+        // ==========================================
         db.collection("pending_jobs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const activeContainer = document.getElementById("tvActiveQueueBody");
             activeContainer.innerHTML = "";
@@ -343,6 +345,18 @@
                 
                 let timeColorClass = job.status === "Paused" ? "paused-text" : "";
 
+                // Extract and format the permanent start time
+                let formattedStartTime = "Syncing...";
+                if (job.timestamp) {
+                    const d = job.timestamp.toDate();
+                    const hrs = d.getHours() % 12 || 12;
+                    const mins = String(d.getMinutes()).padStart(2, '0');
+                    const ampm = d.getHours() >= 12 ? 'PM' : 'AM';
+                    const month = d.toLocaleString('en-US', { month: 'short' });
+                    const day = d.getDate();
+                    formattedStartTime = `${month} ${day}, ${hrs}:${mins} ${ampm}`;
+                }
+
                 row.innerHTML = `
                     <div class="job-identity-block">
                         <h2>${job.vehicle}</h2>
@@ -350,6 +364,9 @@
                     </div>
                     <div><span class="classification-pill ${isCriticalTrack ? 'accident-mode' : ''}">${job.jobType || 'General'}</span></div>
                     <div style="font-weight:500;">👤 ${job.technician}</div>
+                    
+                    <div style="font-size: 0.85rem; font-weight: 600; color: #94a3b8;">🕒 ${formattedStartTime}</div>
+                    
                     <div class="chrono-clock-value ${timeColorClass}" id="timer-${id}">00:00:00</div>
                     <div class="priority-indicator ${job.priority === 'High' ? 'flag-high' : ''}">${job.priority || 'Normal'}</div>
                 `;
@@ -389,7 +406,6 @@
             
             document.getElementById("countActiveSection").innerText = `${tallyActive} Units Tracked`;
 
-            // Trigger scroll reset configuration mapping
             setTimeout(runQueueAutoScroll, 600);
         });
     </script>
