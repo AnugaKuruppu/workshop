@@ -64,10 +64,13 @@
         .ticker-container { background: #0b0c1f; border: 1px solid var(--border-glow); padding: 8px 20px; border-radius: 8px; font-size: 0.8rem; color: #94a3b8; overflow: hidden; white-space: nowrap; }
         .ticker-wrap { display: inline-block; animation: marquee 25s linear infinite; }
 
-        #jobFinishedOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #03040a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10005; animation: fadeIn 0.2s ease forwards; }
-        .finished-title-hero { font-size: 5rem; font-weight: 900; color: var(--action-green); text-transform: uppercase; letter-spacing: -1px; margin-bottom: 10px; }
-        .finished-vehicle-display { font-family: 'Inter', sans-serif; font-size: 9rem; font-weight: 800; color: #fff; line-height: 1; margin: 20px 0; }
-        .finished-meta-sub { color: #94a3b8; font-weight: 600; font-size: 2rem; letter-spacing: 2px; text-transform: uppercase; }
+        /* Full Screen List Overlay for Completed Jobs */
+        #jobFinishedOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 4, 10, 0.98); backdrop-filter: blur(15px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10005; animation: fadeIn 0.3s ease forwards; padding: 40px; }
+        .finished-title-hero { font-size: 4rem; font-weight: 900; color: var(--action-green); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; text-align: center; }
+        .finished-list-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; width: 100%; max-width: 1600px; max-height: 75vh; overflow-y: auto; align-content: flex-start; }
+        .finished-list-item { background: rgba(6, 214, 160, 0.05); border: 1px solid rgba(6, 214, 160, 0.2); border-left: 5px solid var(--action-green); padding: 25px; border-radius: 12px; min-width: 320px; flex: 1; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 8px; }
+        .finished-list-item h2 { font-size: 2.2rem; font-weight: 800; color: #fff; margin: 0; line-height: 1; }
+        .finished-list-item p { font-size: 1rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin: 0; }
 
         #lunchOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #03040a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
         .lunch-title-hero { font-size: 5.5rem; font-weight: 900; color: var(--action-amber); text-transform: uppercase; letter-spacing: -1px; }
@@ -81,9 +84,10 @@
 <body>
 
     <div id="jobFinishedOverlayLayer">
-        <div class="finished-title-hero">🏁 JOB COMPLETED</div>
-        <div class="finished-vehicle-display" id="popupVehicleCode">---</div>
-        <div class="finished-meta-sub" id="popupJobMeta">TECH: ---</div>
+        <div class="finished-title-hero">🏁 COMPLETED JOBS BOARD</div>
+        <div class="finished-list-container" id="finishedListContainer">
+            <!-- Items Injected by JS -->
+        </div>
     </div>
 
     <div id="lunchOverlayLayer">
@@ -147,6 +151,9 @@
         const db = firebase.firestore();
 
         let activeTimers = {};
+        let initialLoadComplete = false;
+        let runningJobStates = {}; 
+        let finishedJobsList = []; // Global array to hold the full finished list for the popup grid
         
         function playChimeNotification() {
             try {
@@ -194,47 +201,52 @@
             });
         }, 1000);
 
-        // -- ROTATION LOGIC START --
-        let finishedJobs = [];
-        let currentIndex = 0;
+        // -- LIST ROTATION LOGIC START --
         let rotationTimer = null;
+        let overlayTimeout = null;
 
         db.collection("system_state").doc("rotation_settings").onSnapshot(doc => {
             const settings = doc.data() || { frequency: 5, duration: 30 };
-            startRotation(settings);
-        });
-
-        db.collection("pending_jobs").where("status", "==", "Finished").onSnapshot(snap => {
-            finishedJobs = snap.docs.map(d => d.data());
-        });
-
-        function startRotation(settings) {
+            
             if (rotationTimer) clearInterval(rotationTimer);
             rotationTimer = setInterval(() => {
-                if (finishedJobs.length > 0) {
-                    const job = finishedJobs[currentIndex % finishedJobs.length];
-                    triggerFullScreenCompletion(job.vehicle, job.jobType || 'Service', job.technician);
-                    currentIndex++;
+                if (finishedJobsList.length > 0) {
+                    triggerFullScreenListDisplay();
                 }
             }, settings.frequency * 60 * 1000);
-        }
-        // -- ROTATION LOGIC END --
+        });
 
-        function triggerFullScreenCompletion(vehicle, classification, technician) {
+        function triggerFullScreenListDisplay() {
             const layer = document.getElementById("jobFinishedOverlayLayer");
-            document.getElementById("popupVehicleCode").innerText = vehicle;
-            document.getElementById("popupJobMeta").innerText = `${classification} • Tech: ${technician}`;
-            
+            const container = document.getElementById("finishedListContainer");
+            container.innerHTML = "";
+
+            if(finishedJobsList.length === 0) return;
+
+            // Generate the grid cards dynamically based on total array
+            finishedJobsList.forEach(job => {
+                const div = document.createElement("div");
+                div.className = "finished-list-item";
+                div.innerHTML = `
+                    <h2>${job.vehicle}</h2>
+                    <p>${job.jobType || 'General Service'} • Tech: ${job.technician}</p>
+                `;
+                container.appendChild(div);
+            });
+
             layer.style.display = "flex";
             playChimeNotification();
 
+            if(overlayTimeout) clearTimeout(overlayTimeout);
+
             db.collection("system_state").doc("rotation_settings").get().then(doc => {
                 const dur = doc.data() ? doc.data().duration : 30;
-                setTimeout(() => {
+                overlayTimeout = setTimeout(() => {
                     layer.style.display = "none";
                 }, dur * 1000);
             });
         }
+        // -- LIST ROTATION LOGIC END --
 
         let lunchCountdownEngine = null;
         db.collection("system_state").doc("lunch_break").onSnapshot((doc) => {
@@ -275,13 +287,22 @@
             activeTimers = {};
 
             let tallyActive = 0, tallyDone = 0, tallyHigh = 0;
+            let currentSnapshotJobs = {};
+            finishedJobsList = []; // Clear array for rebuild
 
             snapshot.forEach((doc) => {
                 const job = doc.data();
                 const id = doc.id;
+                currentSnapshotJobs[id] = job.status;
                 
                 if (job.status === "Finished") {
                     tallyDone++;
+                    finishedJobsList.push(job); // Maintain the array of completed jobs
+
+                    // Real-time instant popup if a job was JUST finished in this cycle
+                    if (initialLoadComplete && runningJobStates[id] && runningJobStates[id] !== "Finished") {
+                        triggerFullScreenListDisplay(); 
+                    }
                     return; 
                 }
 
@@ -331,6 +352,9 @@
                     if (el) el.innerText = `${hr}:${mn}:${sc}`;
                 }, 1000);
             });
+
+            runningJobStates = currentSnapshotJobs;
+            initialLoadComplete = true;
 
             document.getElementById("mActive").innerText = tallyActive;
             document.getElementById("mHigh").innerText = tallyHigh;
