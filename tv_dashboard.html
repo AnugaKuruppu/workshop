@@ -6,6 +6,9 @@
     <title>GT AutoMech - Production Control Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        /* ==========================================
+           CORE ENVIRONMENT VARIABLES & LAYOUT RULES (TV 1-10)
+           ========================================== */
         :root {
             --bg-deep: #06060c;
             --bg-surface: rgba(17, 17, 34, 0.6);
@@ -40,6 +43,10 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-deep); }
         ::-webkit-scrollbar-thumb { background: #1e1e38; border-radius: 4px; }
+
+        /* ==========================================
+           HEADER MATRIX & REAL-TIME WIDGETS (TV 11-20)
+           ========================================== */
         .header-matrix {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr;
@@ -67,12 +74,20 @@
         .telemetry-value { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
         .telemetry-value.pulse { color: var(--neon-finished); animation: pulseGreen 2s infinite; }
         .live-pulse-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--neon-finished); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 8px var(--neon-finished); }
+
+        /* ==========================================
+           PRODUCTION COUNTERS & METRICS (TV 21-30)
+           ========================================== */
         .metrics-shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .metric-card { background: var(--bg-surface); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-glow); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; }
         .metric-card::before { content: ''; position: absolute; top:0; left:0; width: 4px; height: 100%; background: var(--accent-color); }
         .metric-info h3 { font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
         .metric-info p { font-size: 2rem; font-weight: 800; margin-top: 5px; }
         .metric-icon-box { font-size: 1.8rem; opacity: 0.25; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+
+        /* ==========================================
+           DATA WORKSPACE TABLE ENGINE (TV 31-40)
+           ========================================== */
         .data-workspace { background: var(--bg-surface); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-glow); border-radius: 16px; box-shadow: var(--shadow-matrix); overflow: hidden; flex-grow: 1; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { background-color: rgba(10, 10, 20, 0.9); color: var(--text-secondary); padding: 22px 24px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid rgba(255,255,255,0.05); }
@@ -81,23 +96,44 @@
         tr:hover { background-color: rgba(255, 255, 255, 0.02) !important; }
         .state-pending { background-color: rgba(255, 183, 3, 0.01); }
         .state-finished { background-color: rgba(6, 214, 160, 0.03); }
+        
         .vehicle-title { font-size: 1.3rem; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
         .vehicle-meta { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 10px; }
+        
+        /* FIX: REMOVED REREGISTERED HEIGHTS TO RECTIFY OVERLAPPING CLASS MATRIX TEXT GLITCHES */
+        .type-tag-pill { 
+            display: inline-block;
+            padding: 6px 14px; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            line-height: 1.3;
+            white-space: nowrap;
+            border: 1px solid transparent; 
+            max-width: 100%;
+        }
+        .tag-accident { background: rgba(255, 77, 109, 0.1); color: var(--neon-accident); border-color: rgba(255, 77, 109, 0.2); }
+        .tag-service { background: rgba(0, 180, 216, 0.1); color: var(--neon-service); border-color: rgba(0, 180, 216, 0.2); }
+        
         .badge-capsule { padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
         .badge-pending { background: rgba(255, 183, 3, 0.1); color: var(--neon-pending); border: 1px solid rgba(255, 183, 3, 0.25); animation: pulseGlow 2s infinite alternate; }
         .badge-finished { background: rgba(6, 214, 160, 0.1); color: var(--neon-finished); border: 1px solid rgba(6, 214, 160, 0.25); }
-        .type-tag-pill { padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid transparent; }
-        .tag-accident { background: rgba(255, 77, 109, 0.1); color: var(--neon-accident); border-color: rgba(255, 77, 109, 0.2); }
-        .tag-service { background: rgba(0, 180, 216, 0.1); color: var(--neon-service); border-color: rgba(0, 180, 216, 0.2); }
+        
         .clock-counter { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.4rem; letter-spacing: -0.5px; }
         .state-pending .clock-counter { color: var(--neon-pending); text-shadow: 0 0 10px rgba(255,183,3,0.2); }
         .state-finished .clock-counter { color: var(--neon-finished); opacity: 0.6; }
+        
         .tech-profile { display: flex; align-items: center; gap: 12px; }
-        .tech-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1e1e38; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: var(--text-primary); border: 1px solid var(--border-glow); }
-        .ticker-belt { background: #0b0b14; border: 1px solid var(--border-glow); padding: 12px 25px; border-radius: 12px; display: flex; align-items: center; gap: 20px; font-size: 0.9rem; overflow: hidden; }
+        .tech-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1e1e38; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: var(--text-primary); border: 1px solid var(--border-glow); text-transform: uppercase; }
+
+        /* ==========================================
+           RUNNING BROADCAST SYSTEM (TV 41-50)
+           ========================================== */
+        .ticker-belt { background: #0b0b14; border: 1px solid var(--border-glow); padding: 12px 25px; border-radius: 12px; display: flex; align-items: center; gap: 20px; font-size: 0.9rem; overflow: hidden; margin-top: auto; }
         .ticker-title { background: var(--neon-system); color: white; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
         .ticker-marquee { white-space: nowrap; overflow: hidden; box-sizing: border-box; width: 100%; position: relative; }
         .ticker-text-wrapper { display: inline-block; padding-left: 100%; animation: marqueeTransition 25s linear infinite; color: var(--text-secondary); }
+        
         @keyframes marqueeTransition { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
         @keyframes pulseGreen { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 5px rgba(255, 183, 3, 0.2); } 100% { box-shadow: 0 0 20px rgba(255, 183, 3, 0.5); } }
@@ -174,7 +210,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script>
-        // Loaded with your unique Firebase Profile Parameters
         const firebaseConfig = {
             apiKey: "AIzaSyA4QLYVrY5A4D1Dv6kuiFT68VVrY0r82yQ",
             authDomain: "gt-job-card.firebaseapp.com",
@@ -212,23 +247,28 @@
                   
                   const isPending = job.status === "Pending";
                   if(isPending) activeCount++; else closedCount++;
-                  if(job.jobType === "Accident Repair" && isPending) accidentCount++;
+                  
+                  const normalizedType = (job.jobType || "").trim();
+                  if(normalizedType.toLowerCase().includes("accident") && isPending) {
+                      accidentCount++;
+                  }
 
-                  const initials = job.technician ? job.technician.split(' ').map(n => n[0]).join('') : "MX";
-                  const tagClass = job.jobType === "Accident Repair" ? "tag-accident" : "tag-service";
+                  const rawTech = job.technician || "Unassigned";
+                  const initials = rawTech.split(' ').map(n => n[0]).join('').substring(0, 3);
+                  const tagClass = normalizedType.toLowerCase().includes("accident") ? "tag-accident" : "tag-service";
 
                   const tr = document.createElement("tr");
                   tr.className = isPending ? "state-pending" : "state-finished";
                   tr.innerHTML = `
                       <td>
-                          <div class="vehicle-title">${job.vehicle}</div>
+                          <div class="vehicle-title">${job.vehicle || "Untitled"}</div>
                           <div class="vehicle-meta"><span>ID: ${id.substring(0,6).toUpperCase()}</span> • <span>Cloud Sync Active</span></div>
                       </td>
-                      <td><span class="type-tag-pill ${tagClass}">${job.jobType}</span></td>
+                      <td><span class="type-tag-pill ${tagClass}">${normalizedType || "General Work"}</span></td>
                       <td>
                           <div class="tech-profile">
-                              <div class="tech-avatar">${initials}</div>
-                              <span style="font-weight: 500;">${job.technician}</span>
+                              <div class="tech-avatar">${initials || "MX"}</div>
+                              <span style="font-weight: 500;">${rawTech}</span>
                           </div>
                       </td>
                       <td><span class="clock-counter" id="chrono-${id}">00:00:00</span></td>
