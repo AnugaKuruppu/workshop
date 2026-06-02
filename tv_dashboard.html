@@ -3,219 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GT AutoMech - Production Control Center</title>
+    <title>GT AutoMech - Production Execution System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        /* ==========================================
+           ORIGINAL DARK GRID DESIGN VARIABLES
+           ========================================== */
         :root {
-            --bg-deep: #06060c;
-            --bg-surface: rgba(17, 17, 34, 0.6);
-            --bg-card: rgba(30, 30, 50, 0.4);
-            --border-glow: rgba(255, 255, 255, 0.08);
+            --bg-base: #060713;
+            --bg-panel: rgba(14, 16, 32, 0.7);
+            --bg-card: #0f1126;
+            --border-glow: rgba(255, 255, 255, 0.05);
             --text-main: #f1f5f9;
-            --text-muted: #64748b;
+            --text-alt: #475569;
             --action-cyan: #00b4d8;
-            --action-rose: #ff4d6d;
             --action-green: #06d6a0;
-            --font-mono: 'JetBrains Mono', monospace;
+            --action-amber: #ffb703;
+            --action-rose: #ff4d6d;
+            --blur-radius: blur(25px);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
-            background-color: var(--bg-deep);
+            background-color: var(--bg-base);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            padding: 40px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            gap: 30px;
-            overflow-x: hidden;
+            gap: 25px;
         }
 
-        /* HEADER BRANDING */
+        /* METADATA COCKPIT CONTROL HEADER */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-surface);
-            backdrop-filter: blur(20px);
+            background: var(--bg-panel);
+            backdrop-filter: var(--blur-radius);
             border: 1px solid var(--border-glow);
-            padding: 24px 40px;
-            border-radius: 16px;
+            padding: 20px 35px;
+            border-radius: 14px;
         }
-
-        .brand h1 { font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; }
-        .brand span { color: var(--action-cyan); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; }
+        .brand-block h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+        .brand-block span { color: var(--action-cyan); font-weight: 700; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
         
-        .live-indicator {
+        .sys-meta-telemetry { display: flex; gap: 40px; align-items: center; text-align: right; }
+        .meta-node-title { font-size: 0.75rem; color: #475569; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .meta-node-value { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; color: #94a3b8; }
+        .meta-node-value.status-on { color: var(--action-green); font-family: 'Inter', sans-serif; }
+
+        /* METRICS CONTROLLERS INFRASTRUCTURE */
+        .metrics-row-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .metric-widget-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-left: 5px solid var(--accent-line, var(--action-cyan));
+            border-radius: 12px;
+            padding: 22px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            background: rgba(6, 214, 160, 0.06);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: 1px solid rgba(6, 214, 160, 0.2);
-            color: var(--action-green);
+            position: relative;
         }
-        .pulse-dot { width: 10px; height: 10px; background: var(--action-green); border-radius: 50%; animation: pulse 2s infinite; }
+        .metric-meta-lbl { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .metric-counter-big { font-size: 2.4rem; font-weight: 800; color: #fff; margin-top: 5px; }
+        .metric-icon-bg { font-size: 1.5rem; opacity: 0.15; position: absolute; right: 25px; }
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(6, 214, 160, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
-        }
-
-        /* TABLE TRACK LAYER */
-        .dashboard-matrix {
-            background: var(--bg-surface);
-            backdrop-filter: blur(20px);
+        /* PRODUCTION ENGINE MATRIX BOARD */
+        .matrix-board-wrapper {
+            background: var(--bg-panel);
+            backdrop-filter: var(--blur-radius);
             border: 1px solid var(--border-glow);
             border-radius: 16px;
-            overflow: hidden;
-            flex-grow: 1;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-        }
-
-        .matrix-header {
-            display: grid;
-            grid-template-columns: 4fr 3fr 3fr 3fr;
-            padding: 20px 40px;
-            background: rgba(255,255,255,0.02);
-            border-bottom: 1px solid var(--border-glow);
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-        }
-
-        .matrix-body {
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            max-height: 65vh;
-        }
-
-        .matrix-row {
-            display: grid;
-            grid-template-columns: 4fr 3fr 3fr 3fr;
-            padding: 26px 40px;
-            border-bottom: 1px solid var(--border-glow);
-            align-items: center;
-            background: var(--bg-card);
-            transition: all 0.2s ease;
-        }
-        
-        .matrix-row:nth-child(even) { background: transparent; }
-
-        .veh-info h2 { font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-        .veh-info span { font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px; display: inline-block; }
-
-        .tag-pill {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            background: rgba(0, 180, 216, 0.1);
-            color: var(--action-cyan);
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-        }
-        
-        .tag-pill.accident {
-            background: rgba(255, 77, 109, 0.1);
-            color: var(--action-rose);
-            border: 1px solid rgba(255, 77, 109, 0.2);
-        }
-
-        .tech-identity {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        .avatar-circle {
-            width: 32px;
-            height: 32px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-glow);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--action-cyan);
-        }
-
-        .chrono-counter {
-            font-family: var(--font-mono);
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        /* SYSTEM BROADCAST FOOTER TAPE */
-        .ticker-wrap {
-            background: rgba(15, 10, 25, 0.6);
-            border: 1px solid var(--border-glow);
-            padding: 14px 30px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            flex-grow: 1;
             overflow: hidden;
         }
-        .ticker-title {
-            background: linear-gradient(135deg, #7209b7 0%, #560bad 100%);
-            padding: 6px 14px;
-            border-radius: 6px;
+        .matrix-th-row {
+            display: grid;
+            grid-template-columns: 3.5fr 2fr 2.5fr 2.5fr 2fr;
+            padding: 18px 35px;
+            background: rgba(255,255,255,0.01);
+            border-bottom: 1px solid var(--border-glow);
             font-size: 0.8rem;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            white-space: nowrap;
+            color: #64748b;
         }
-        .ticker-text {
-            font-size: 0.95rem;
-            color: #94a3b8;
-            font-weight: 500;
-            white-space: nowrap;
+        .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; max-height: 50vh; }
+        
+        .matrix-body-row {
+            display: grid;
+            grid-template-columns: 3.5fr 2fr 2.5fr 2.5fr 2fr;
+            padding: 24px 35px;
+            border-bottom: 1px solid var(--border-glow);
+            align-items: center;
+            background: rgba(255,255,255,0.01);
         }
+        .matrix-body-row:nth-child(even) { background: transparent; }
+
+        .job-identity-block h2 { font-size: 1.5rem; font-weight: 800; color: #fff; }
+        .job-identity-block span { font-size: 0.8rem; color: #475569; font-family: 'JetBrains Mono', monospace; margin-top: 4px; display: block; }
+        
+        .classification-pill {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(0, 180, 216, 0.08);
+            color: var(--action-cyan);
+            border: 1px solid rgba(0, 180, 216, 0.15);
+        }
+        .classification-pill.accident-mode {
+            background: rgba(255, 77, 109, 0.08);
+            color: var(--action-rose);
+            border: 1px solid rgba(255, 77, 109, 0.15);
+        }
+
+        .technician-profile { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 600; }
+        .tech-avatar { width: 30px; height: 30px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--action-cyan); }
+        
+        .chrono-clock-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--action-green); }
+        
+        .status-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(6, 214, 160, 0.06);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--action-green);
+            border: 1px solid rgba(6, 214, 160, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+
+        /* TICKER TAPE MODULE SYSTEM */
+        .ticker-tape-container { background: rgba(9, 9, 20, 0.6); border: 1px solid var(--border-glow); padding: 12px 25px; border-radius: 10px; display: flex; align-items: center; gap: 20px; overflow: hidden; }
+        .ticker-badge { background: #7209b7; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+        .ticker-marquee-text { font-size: 0.9rem; color: #64748b; font-weight: 500; white-space: nowrap; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="brand">
-            <h1>GT AUTOMECH</h1>
-            <span>LIVE WORKSHOP PRODUCTION MATRIX</span>
+        <div class="brand-block">
+            <h1>GT AutoMech</h1>
+            <span>Production Execution System</span>
         </div>
-        <div class="live-indicator">
-            <div class="pulse-dot"></div>
-            <div>LIVE STREAM ACTIVE</div>
+        <div class="sys-meta-telemetry">
+            <div>
+                <div class="meta-node-title">System Node</div>
+                <div class="meta-node-value">BAY-MONITOR-01</div>
+            </div>
+            <div>
+                <div class="meta-node-title">Operational Link</div>
+                <div class="meta-node-value status-on">● ONLINE</div>
+            </div>
+            <div>
+                <div class="meta-node-title">Current Time</div>
+                <div class="meta-node-value" id="headerClockField">00:00:00 AM</div>
+            </div>
         </div>
     </header>
 
-    <div class="dashboard-matrix">
-        <div class="matrix-header">
+    <div class="metrics-row-grid">
+        <div class="metric-widget-card" style="--accent-line: var(--action-amber);">
+            <div>
+                <div class="metric-meta-lbl">Active Repairs</div>
+                <div class="metric-counter-big" id="metricActiveVal">0</div>
+            </div>
+            <div class="metric-icon-bg">🔧</div>
+        </div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-green);">
+            <div>
+                <div class="metric-meta-lbl">Cleared Today</div>
+                <div class="metric-counter-big" id="metricClearedVal">0</div>
+            </div>
+            <div class="metric-icon-bg">🚗</div>
+        </div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-cyan);">
+            <div>
+                <div class="metric-meta-lbl">Service Rate</div>
+                <div class="metric-counter-big" id="metricRateVal">100%</div>
+            </div>
+            <div class="metric-icon-bg">📊</div>
+        </div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-rose);">
+            <div>
+                <div class="metric-meta-lbl">Accident Bays</div>
+                <div class="metric-counter-big" id="metricAccidentVal">0</div>
+            </div>
+            <div class="metric-icon-bg">🚨</div>
+        </div>
+    </div>
+
+    <div class="matrix-board-wrapper">
+        <div class="matrix-th-row">
             <div>Vehicle Identification & Details</div>
             <div>Classification</div>
             <div>Assigned Technician</div>
             <div>Production Track Chrono</div>
+            <div>Operation Status</div>
         </div>
-        <div class="matrix-body" id="tvQueueBody">
-            </div>
+        <div class="matrix-tbody-flow" id="tvQueueBody"></div>
     </div>
 
-    <div class="ticker-wrap">
-        <div class="ticker-title">System Broadcast</div>
-        <div class="ticker-text">Security Protocol Active // Keep all exit pathways clear // Ensure all digital job cards are closed out promptly upon vehicle exit.</div>
+    <div class="ticker-tape-container">
+        <div class="ticker-badge">System Broadcast</div>
+        <div class="ticker-marquee-text">Security Protocol Active // Keep all exit pathways clear // Ensure all digital job cards are closed out promptly upon vehicle exit.</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -236,7 +244,42 @@
 
         let tvIntervals = {};
 
-        // MAIN FIRESTORE STREAM PIPELINE (FILTERED TO PENDING ONLY)
+        // COCKPIT CLOCK ENGINE
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById("headerClockField").innerText = now.toLocaleTimeString();
+        }, 1000);
+
+        // GLOBAL METRICS ANALYTICS SYNCHRONIZER
+        db.collection("pending_jobs").onSnapshot((snapshot) => {
+            let activeCount = 0;
+            let accidentCount = 0;
+            let completedCount = 0;
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const type = (data.jobType || "").toLowerCase();
+                
+                if (data.status === "Pending") {
+                    activeCount++;
+                    if (type.includes("accident")) {
+                        accidentCount++;
+                    }
+                } else if (data.status === "Finished") {
+                    completedCount++;
+                }
+            });
+
+            document.getElementById("metricActiveVal").innerText = activeCount;
+            document.getElementById("metricAccidentVal").innerText = accidentCount;
+            document.getElementById("metricClearedVal").innerText = completedCount;
+            
+            const totalJobs = activeCount + completedCount;
+            const rate = totalJobs > 0 ? Math.round((completedCount / totalJobs) * 100) : 100;
+            document.getElementById("metricRateVal").innerText = `${rate}%`;
+        });
+
+        // REAL-TIME DATAPORT PIPELINE STREAM (FILTERED EXCLUSIVELY TO PENDING STATUS)
         db.collection("pending_jobs")
           .where("status", "==", "Pending")
           .orderBy("timestamp", "desc")
@@ -244,15 +287,14 @@
               const body = document.getElementById("tvQueueBody");
               body.innerHTML = "";
               
-              // Clear old running interval timers
               for (let key in tvIntervals) { clearInterval(tvIntervals[key]); }
               tvIntervals = {};
 
               if (snapshot.empty) {
                   body.innerHTML = `
-                      <div style="text-align: center; padding: 100px 20px; color: var(--text-muted);">
-                          <div style="font-size: 3.5rem; margin-bottom: 15px;">🏁</div>
-                          <h2 style="font-weight: 500;">All Clear! No Vehicles in Production Queue.</h2>
+                      <div style="text-align: center; padding: 80px 20px; color: #475569;">
+                          <div style="font-size: 3rem; margin-bottom: 10px;">🏁</div>
+                          <h3>All Production Operational Streams Clear</h3>
                       </div>
                   `;
                   return;
@@ -267,26 +309,28 @@
                   const initialLetter = job.technician ? job.technician.trim().charAt(0).toUpperCase() : "?";
 
                   const row = document.createElement("div");
-                  row.className = "matrix-row";
+                  row.className = "matrix-body-row";
                   
                   row.innerHTML = `
-                      <div class="veh-info">
-                          <h2>${job.vehicle || "Untitled Vehicle"}</h2>
+                      <div class="job-identity-block">
+                          <h2>${job.vehicle || "Untitled"}</h2>
                           <span>ID: ${id.substring(0, 6).toUpperCase()} • Cloud Sync Active</span>
                       </div>
                       <div>
-                          <span class="tag-pill ${isAccident ? 'accident' : ''}">${typeText}</span>
+                          <span class="classification-pill ${isAccident ? 'accident-mode' : ''}">${typeText}</span>
                       </div>
-                      <div class="tech-identity">
-                          <div class="avatar-circle">${initialLetter}</div>
+                      <div class="technician-profile">
+                          <div class="tech-avatar">${initialLetter}</div>
                           <div>${job.technician || "Unassigned"}</div>
                       </div>
-                      <div class="chrono-counter" id="tv-timer-${id}">00:00:00</div>
+                      <div class="chrono-clock-value" id="tv-timer-${id}">00:00:00</div>
+                      <div>
+                          <span class="status-badge-pill">⚙️ In Progress</span>
+                      </div>
                   `;
                   
                   body.appendChild(row);
 
-                  // LIVE TRACKING CHRONOMETER ENGINE
                   const startTime = job.timestamp ? job.timestamp.toDate() : new Date();
                   tvIntervals[id] = setInterval(() => {
                       const elapsed = new Date() - startTime;
@@ -295,10 +339,8 @@
                       const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
                       const s = String(secs % 60).padStart(2, '0');
                       
-                      const timerElement = document.getElementById(`tv-timer-${id}`);
-                      if (timerElement) {
-                          timerElement.innerText = `${h}:${m}:${s}`;
-                      }
+                      const timerEl = document.getElementById(`tv-timer-${id}`);
+                      if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
                   }, 1000);
               });
           });
