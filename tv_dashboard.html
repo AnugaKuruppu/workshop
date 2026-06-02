@@ -64,7 +64,6 @@
         .ticker-container { background: #0b0c1f; border: 1px solid var(--border-glow); padding: 8px 20px; border-radius: 8px; font-size: 0.8rem; color: #94a3b8; overflow: hidden; white-space: nowrap; }
         .ticker-wrap { display: inline-block; animation: marquee 25s linear infinite; }
 
-        /* Full Screen Takeover Layer for Completions */
         #jobFinishedOverlayLayer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #03040a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10005; animation: fadeIn 0.2s ease forwards; }
         .finished-title-hero { font-size: 5rem; font-weight: 900; color: var(--action-green); text-transform: uppercase; letter-spacing: -1px; margin-bottom: 10px; }
         .finished-vehicle-display { font-family: 'Inter', sans-serif; font-size: 9rem; font-weight: 800; color: #fff; line-height: 1; margin: 20px 0; }
@@ -81,7 +80,6 @@
 </head>
 <body>
 
-    <!-- Full-Screen Takeover Completion Layer -->
     <div id="jobFinishedOverlayLayer">
         <div class="finished-title-hero">🏁 JOB COMPLETED</div>
         <div class="finished-vehicle-display" id="popupVehicleCode">---</div>
@@ -149,15 +147,10 @@
         const db = firebase.firestore();
 
         let activeTimers = {};
-        let initialLoadComplete = false;
-        let runningJobStates = {}; 
         
-        // Synth Audio Generator Context Engine
         function playChimeNotification() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Note 1 (E5)
                 const osc1 = audioCtx.createOscillator();
                 const gain1 = audioCtx.createGain();
                 osc1.type = 'sine';
@@ -169,7 +162,6 @@
                 osc1.start();
                 osc1.stop(audioCtx.currentTime + 0.4);
 
-                // Note 2 (A5) played slightly later
                 setTimeout(() => {
                     const osc2 = audioCtx.createOscillator();
                     const gain2 = audioCtx.createGain();
@@ -182,8 +174,7 @@
                     osc2.start();
                     osc2.stop(audioCtx.currentTime + 0.6);
                 }, 150);
-
-            } catch(e) { console.log("Audio couldn't play: Browser interaction limit.", e); }
+            } catch(e) { console.log("Audio limits.", e); }
         }
 
         setInterval(() => {
@@ -203,7 +194,32 @@
             });
         }, 1000);
 
-        // Big Full-Screen Takeover Handler
+        // -- ROTATION LOGIC START --
+        let finishedJobs = [];
+        let currentIndex = 0;
+        let rotationTimer = null;
+
+        db.collection("system_state").doc("rotation_settings").onSnapshot(doc => {
+            const settings = doc.data() || { frequency: 5, duration: 30 };
+            startRotation(settings);
+        });
+
+        db.collection("pending_jobs").where("status", "==", "Finished").onSnapshot(snap => {
+            finishedJobs = snap.docs.map(d => d.data());
+        });
+
+        function startRotation(settings) {
+            if (rotationTimer) clearInterval(rotationTimer);
+            rotationTimer = setInterval(() => {
+                if (finishedJobs.length > 0) {
+                    const job = finishedJobs[currentIndex % finishedJobs.length];
+                    triggerFullScreenCompletion(job.vehicle, job.jobType || 'Service', job.technician);
+                    currentIndex++;
+                }
+            }, settings.frequency * 60 * 1000);
+        }
+        // -- ROTATION LOGIC END --
+
         function triggerFullScreenCompletion(vehicle, classification, technician) {
             const layer = document.getElementById("jobFinishedOverlayLayer");
             document.getElementById("popupVehicleCode").innerText = vehicle;
@@ -212,9 +228,12 @@
             layer.style.display = "flex";
             playChimeNotification();
 
-            setTimeout(() => {
-                layer.style.display = "none";
-            }, 5000);
+            db.collection("system_state").doc("rotation_settings").get().then(doc => {
+                const dur = doc.data() ? doc.data().duration : 30;
+                setTimeout(() => {
+                    layer.style.display = "none";
+                }, dur * 1000);
+            });
         }
 
         let lunchCountdownEngine = null;
@@ -256,17 +275,11 @@
             activeTimers = {};
 
             let tallyActive = 0, tallyDone = 0, tallyHigh = 0;
-            let currentSnapshotJobs = {};
 
             snapshot.forEach((doc) => {
                 const job = doc.data();
                 const id = doc.id;
-                currentSnapshotJobs[id] = job.status;
                 
-                if (initialLoadComplete && job.status === "Finished" && runningJobStates[id] && runningJobStates[id] !== "Finished") {
-                    triggerFullScreenCompletion(job.vehicle, job.jobType || 'General Service', job.technician);
-                }
-
                 if (job.status === "Finished") {
                     tallyDone++;
                     return; 
@@ -318,9 +331,6 @@
                     if (el) el.innerText = `${hr}:${mn}:${sc}`;
                 }, 1000);
             });
-
-            runningJobStates = currentSnapshotJobs;
-            initialLoadComplete = true;
 
             document.getElementById("mActive").innerText = tallyActive;
             document.getElementById("mHigh").innerText = tallyHigh;
