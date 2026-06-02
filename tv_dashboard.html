@@ -6,21 +6,16 @@
     <title>GT AutoMech - Production Execution System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* ==========================================
-           ORIGINAL DARK GRID DESIGN VARIABLES
-           ========================================== */
         :root {
             --bg-base: #060713;
             --bg-panel: rgba(14, 16, 32, 0.7);
             --bg-card: #0f1126;
             --border-glow: rgba(255, 255, 255, 0.05);
             --text-main: #f1f5f9;
-            --text-alt: #475569;
             --action-cyan: #00b4d8;
             --action-green: #06d6a0;
             --action-amber: #ffb703;
             --action-rose: #ff4d6d;
-            --blur-radius: blur(25px);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,18 +30,17 @@
             gap: 25px;
         }
 
-        /* METADATA COCKPIT CONTROL HEADER */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--bg-panel);
-            backdrop-filter: var(--blur-radius);
+            backdrop-filter: blur(25px);
             border: 1px solid var(--border-glow);
             padding: 20px 35px;
             border-radius: 14px;
         }
-        .brand-block h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+        .brand-block h1 { font-size: 2.2rem; font-weight: 800; text-transform: uppercase; }
         .brand-block span { color: var(--action-cyan); font-weight: 700; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
         
         .sys-meta-telemetry { display: flex; gap: 40px; align-items: center; text-align: right; }
@@ -54,12 +48,7 @@
         .meta-node-value { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; color: #94a3b8; }
         .meta-node-value.status-on { color: var(--action-green); font-family: 'Inter', sans-serif; }
 
-        /* METRICS CONTROLLERS INFRASTRUCTURE */
-        .metrics-row-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
+        .metrics-row-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .metric-widget-card {
             background: var(--bg-card);
             border: 1px solid var(--border-glow);
@@ -69,16 +58,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
         }
-        .metric-meta-lbl { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .metric-meta-lbl { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
         .metric-counter-big { font-size: 2.4rem; font-weight: 800; color: #fff; margin-top: 5px; }
-        .metric-icon-bg { font-size: 1.5rem; opacity: 0.15; position: absolute; right: 25px; }
 
-        /* PRODUCTION ENGINE MATRIX BOARD */
         .matrix-board-wrapper {
             background: var(--bg-panel);
-            backdrop-filter: var(--blur-radius);
+            backdrop-filter: blur(25px);
             border: 1px solid var(--border-glow);
             border-radius: 16px;
             display: flex;
@@ -95,7 +81,6 @@
             font-size: 0.8rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
             color: #64748b;
         }
         .matrix-tbody-flow { display: flex; flex-direction: column; overflow-y: auto; max-height: 50vh; }
@@ -106,57 +91,51 @@
             padding: 24px 35px;
             border-bottom: 1px solid var(--border-glow);
             align-items: center;
-            background: rgba(255,255,255,0.01);
         }
-        .matrix-body-row:nth-child(even) { background: transparent; }
+        .matrix-body-row.row-Finished { opacity: 0.4; background: rgba(0,0,0,0.2); }
+        .matrix-body-row.row-Paused { background: rgba(255, 183, 3, 0.02); }
 
         .job-identity-block h2 { font-size: 1.5rem; font-weight: 800; color: #fff; }
-        .job-identity-block span { font-size: 0.8rem; color: #475569; font-family: 'JetBrains Mono', monospace; margin-top: 4px; display: block; }
+        .job-identity-block span { font-size: 0.8rem; color: #475569; font-family: 'JetBrains Mono', monospace; display: block; margin-top: 4px; }
         
         .classification-pill {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            background: rgba(0, 180, 216, 0.08);
-            color: var(--action-cyan);
-            border: 1px solid rgba(0, 180, 216, 0.15);
+            display: inline-block; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+            background: rgba(0, 180, 216, 0.08); color: var(--action-cyan); border: 1px solid rgba(0, 180, 216, 0.15);
         }
-        .classification-pill.accident-mode {
-            background: rgba(255, 77, 109, 0.08);
-            color: var(--action-rose);
-            border: 1px solid rgba(255, 77, 109, 0.15);
-        }
+        .classification-pill.accident-mode { background: rgba(255, 77, 109, 0.08); color: var(--action-rose); border: 1px solid rgba(255, 77, 109, 0.15); }
 
         .technician-profile { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: 600; }
-        .tech-avatar { width: 30px; height: 30px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--action-cyan); }
+        .tech-avatar { width: 30px; height: 30px; background: rgba(255,255,255,0.04); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--action-cyan); border: 1px solid var(--border-glow); }
         
         .chrono-clock-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--action-green); }
-        
-        .status-badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(6, 214, 160, 0.06);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--action-green);
-            border: 1px solid rgba(6, 214, 160, 0.15);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            width: fit-content;
-        }
+        .chrono-clock-value.paused-text { color: var(--action-amber); }
+        .chrono-clock-value.finished-text { color: #64748b; }
 
-        /* TICKER TAPE MODULE SYSTEM */
-        .ticker-tape-container { background: rgba(9, 9, 20, 0.6); border: 1px solid var(--border-glow); padding: 12px 25px; border-radius: 10px; display: flex; align-items: center; gap: 20px; overflow: hidden; }
-        .ticker-badge { background: #7209b7; padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
-        .ticker-marquee-text { font-size: 0.9rem; color: #64748b; font-weight: 500; white-space: nowrap; }
+        .status-badge-pill {
+            display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+        }
+        .status-badge-pill.in-progress { background: rgba(6, 214, 160, 0.06); color: var(--action-green); border: 1px solid rgba(6, 214, 160, 0.15); }
+        .status-badge-pill.paused { background: rgba(255, 183, 3, 0.06); color: var(--action-amber); border: 1px solid rgba(255, 183, 3, 0.15); }
+        .status-badge-pill.terminated { background: rgba(71, 85, 105, 0.1); color: #94a3b8; border: 1px solid rgba(71, 85, 105, 0.2); }
+
+        /* FULLSCREEN LUNCH BREAK OVERLAY ELEMENT */
+        #lunchOverlayLayer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #04050e; display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999; text-align: center;
+        }
+        .lunch-title-hero { font-size: 6rem; font-weight: 900; letter-spacing: -2px; color: var(--action-amber); margin-bottom: 10px; text-transform: uppercase; }
+        .lunch-subtitle { font-size: 2rem; color: #94a3b8; font-weight: 500; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 4px; }
+        .lunch-countdown-display { font-family: 'JetBrains Mono', monospace; font-size: 12rem; font-weight: 700; color: #fff; text-shadow: 0 0 80px rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
+
+    <div id="lunchOverlayLayer">
+        <div class="lunch-title-hero">🍱 LUNCH BREAK</div>
+        <div class="lunch-subtitle">Workshop Operations Suspended</div>
+        <div class="lunch-countdown-display" id="lunchCountdownClock">00:00</div>
+    </div>
 
     <header>
         <div class="brand-block">
@@ -164,50 +143,17 @@
             <span>Production Execution System</span>
         </div>
         <div class="sys-meta-telemetry">
-            <div>
-                <div class="meta-node-title">System Node</div>
-                <div class="meta-node-value">BAY-MONITOR-01</div>
-            </div>
-            <div>
-                <div class="meta-node-title">Operational Link</div>
-                <div class="meta-node-value status-on">● ONLINE</div>
-            </div>
-            <div>
-                <div class="meta-node-title">Current Time</div>
-                <div class="meta-node-value" id="headerClockField">00:00:00 AM</div>
-            </div>
+            <div><div class="meta-node-title">System Node</div><div class="meta-node-value">BAY-MONITOR-01</div></div>
+            <div><div class="meta-node-title">Operational Link</div><div class="meta-node-value status-on">● ONLINE</div></div>
+            <div><div class="meta-node-title">Current Time</div><div class="meta-node-value" id="headerClockField">00:00:00 AM</div></div>
         </div>
     </header>
 
     <div class="metrics-row-grid">
-        <div class="metric-widget-card" style="--accent-line: var(--action-amber);">
-            <div>
-                <div class="metric-meta-lbl">Active Repairs</div>
-                <div class="metric-counter-big" id="metricActiveVal">0</div>
-            </div>
-            <div class="metric-icon-bg">🔧</div>
-        </div>
-        <div class="metric-widget-card" style="--accent-line: var(--action-green);">
-            <div>
-                <div class="metric-meta-lbl">Cleared Today</div>
-                <div class="metric-counter-big" id="metricClearedVal">0</div>
-            </div>
-            <div class="metric-icon-bg">🚗</div>
-        </div>
-        <div class="metric-widget-card" style="--accent-line: var(--action-cyan);">
-            <div>
-                <div class="metric-meta-lbl">Service Rate</div>
-                <div class="metric-counter-big" id="metricRateVal">100%</div>
-            </div>
-            <div class="metric-icon-bg">📊</div>
-        </div>
-        <div class="metric-widget-card" style="--accent-line: var(--action-rose);">
-            <div>
-                <div class="metric-meta-lbl">Accident Bays</div>
-                <div class="metric-counter-big" id="metricAccidentVal">0</div>
-            </div>
-            <div class="metric-icon-bg">🚨</div>
-        </div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-amber);"><div class="metric-meta-lbl">Active Repairs</div><div class="metric-counter-big" id="metricActiveVal">0</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-green);"><div class="metric-meta-lbl">Cleared Today</div><div class="metric-counter-big" id="metricClearedVal">0</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-cyan);"><div class="metric-meta-lbl">Service Rate</div><div class="metric-counter-big" id="metricRateVal">100%</div></div>
+        <div class="metric-widget-card" style="--accent-line: var(--action-rose);"><div class="metric-meta-lbl">Accident Bays</div><div class="metric-counter-big" id="metricAccidentVal">0</div></div>
     </div>
 
     <div class="matrix-board-wrapper">
@@ -221,11 +167,6 @@
         <div class="matrix-tbody-flow" id="tvQueueBody"></div>
     </div>
 
-    <div class="ticker-tape-container">
-        <div class="ticker-badge">System Broadcast</div>
-        <div class="ticker-marquee-text">Security Protocol Active // Keep all exit pathways clear // Ensure all digital job cards are closed out promptly upon vehicle exit.</div>
-    </div>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script>
@@ -235,115 +176,140 @@
             projectId: "gt-job-card",
             storageBucket: "gt-job-card.firebasestorage.app",
             messagingSenderId: "156974228734",
-            appId: "1:156974228734:web:fb32ec6c250b12f42a71af",
-            measurementId: "G-B76XS6YQB7"
+            appId: "1:156974228734:web:fb32ec6c250b12f42a71af"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         let tvIntervals = {};
+        let runningJobsCache = {};
 
-        // COCKPIT CLOCK ENGINE
         setInterval(() => {
-            const now = new Date();
-            document.getElementById("headerClockField").innerText = now.toLocaleTimeString();
+            document.getElementById("headerClockField").innerText = new Date().toLocaleTimeString();
         }, 1000);
 
-        // GLOBAL METRICS ANALYTICS SYNCHRONIZER
-        db.collection("pending_jobs").onSnapshot((snapshot) => {
-            let activeCount = 0;
-            let accidentCount = 0;
-            let completedCount = 0;
+        // 1. LISTEN TO SYSTEM GLOBAL LUNCH BREAK OVERLAY
+        let lunchTimerInterval = null;
+        db.collection("system_state").doc("lunch_break").onSnapshot((doc) => {
+            const data = doc.data();
+            const overlay = document.getElementById("lunchOverlayLayer");
+            if (lunchTimerInterval) clearInterval(lunchTimerInterval);
 
+            if (data && data.active === true) {
+                overlay.style.display = "flex";
+                
+                const durationMs = data.duration * 60 * 1000;
+                const startBreakTime = data.timestamp ? data.timestamp.toDate() : new Date();
+
+                lunchTimerInterval = setInterval(() => {
+                    const elapsed = new Date() - startBreakTime;
+                    const remainingMs = durationMs - elapsed;
+
+                    if (remainingMs <= 0) {
+                        document.getElementById("lunchCountdownClock").innerText = "00:00";
+                        clearInterval(lunchTimerInterval);
+                    } else {
+                        const totalSecs = Math.floor(remainingMs / 1000);
+                        const mins = String(Math.floor(totalSecs / 60)).padStart(2, '0');
+                        const secs = String(totalSecs % 60).padStart(2, '0');
+                        document.getElementById("lunchCountdownClock").innerText = `${mins}:${secs}`;
+                    }
+                }, 1000);
+            } else {
+                overlay.style.display = "none";
+            }
+        });
+
+        // 2. LISTEN TO ANALYTICS CARD HOOKS
+        db.collection("pending_jobs").onSnapshot((snapshot) => {
+            let active = 0, accident = 0, finished = 0;
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                const type = (data.jobType || "").toLowerCase();
-                
-                if (data.status === "Pending") {
-                    activeCount++;
-                    if (type.includes("accident")) {
-                        accidentCount++;
-                    }
-                } else if (data.status === "Finished") {
-                    completedCount++;
+                if(data.status === "Pending" || data.status === "Paused") {
+                    active++;
+                    if((data.jobType || "").toLowerCase().includes("accident")) accident++;
+                } else if(data.status === "Finished") {
+                    finished++;
                 }
             });
-
-            document.getElementById("metricActiveVal").innerText = activeCount;
-            document.getElementById("metricAccidentVal").innerText = accidentCount;
-            document.getElementById("metricClearedVal").innerText = completedCount;
-            
-            const totalJobs = activeCount + completedCount;
-            const rate = totalJobs > 0 ? Math.round((completedCount / totalJobs) * 100) : 100;
+            document.getElementById("metricActiveVal").innerText = active;
+            document.getElementById("metricAccidentVal").innerText = accident;
+            document.getElementById("metricClearedVal").innerText = finished;
+            const rate = (active + finished) > 0 ? Math.round((finished / (active + finished)) * 100) : 100;
             document.getElementById("metricRateVal").innerText = `${rate}%`;
         });
 
-        // REAL-TIME DATAPORT PIPELINE STREAM (FILTERED EXCLUSIVELY TO PENDING STATUS)
-        db.collection("pending_jobs")
-          .where("status", "==", "Pending")
-          .orderBy("timestamp", "desc")
-          .onSnapshot((snapshot) => {
-              const body = document.getElementById("tvQueueBody");
-              body.innerHTML = "";
-              
-              for (let key in tvIntervals) { clearInterval(tvIntervals[key]); }
-              tvIntervals = {};
+        // 3. MAIN INTERFACE QUEUE SYNC WITH TIMERS
+        db.collection("pending_jobs").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+            const body = document.getElementById("tvQueueBody");
+            body.innerHTML = "";
+            
+            for (let key in tvIntervals) { clearInterval(tvIntervals[key]); }
+            tvIntervals = {};
+            runningJobsCache = {};
 
-              if (snapshot.empty) {
-                  body.innerHTML = `
-                      <div style="text-align: center; padding: 80px 20px; color: #475569;">
-                          <div style="font-size: 3rem; margin-bottom: 10px;">🏁</div>
-                          <h3>All Production Operational Streams Clear</h3>
-                      </div>
-                  `;
-                  return;
-              }
+            snapshot.forEach((doc) => {
+                const job = doc.data();
+                const id = doc.id;
+                runningJobsCache[id] = job;
+                
+                const typeText = job.jobType || "General Service";
+                const isAccident = typeText.toLowerCase().includes("accident");
+                const initialLetter = job.technician ? job.technician.trim().charAt(0).toUpperCase() : "?";
 
-              snapshot.forEach((doc) => {
-                  const job = doc.data();
-                  const id = doc.id;
-                  
-                  const typeText = job.jobType || "General Service";
-                  const isAccident = typeText.toLowerCase().includes("accident");
-                  const initialLetter = job.technician ? job.technician.trim().charAt(0).toUpperCase() : "?";
+                const row = document.createElement("div");
+                row.className = `matrix-body-row row-${job.status}`;
+                
+                let statusLabel = `⚙️ In Progress`;
+                let timerClass = "";
+                if(job.status === "Paused") {
+                    statusLabel = `⏸️ Paused`;
+                    timerClass = "paused-text";
+                } else if(job.status === "Finished") {
+                    statusLabel = `🏁 Terminated`;
+                    timerClass = "finished-text";
+                }
 
-                  const row = document.createElement("div");
-                  row.className = "matrix-body-row";
-                  
-                  row.innerHTML = `
-                      <div class="job-identity-block">
-                          <h2>${job.vehicle || "Untitled"}</h2>
-                          <span>ID: ${id.substring(0, 6).toUpperCase()} • Cloud Sync Active</span>
-                      </div>
-                      <div>
-                          <span class="classification-pill ${isAccident ? 'accident-mode' : ''}">${typeText}</span>
-                      </div>
-                      <div class="technician-profile">
-                          <div class="tech-avatar">${initialLetter}</div>
-                          <div>${job.technician || "Unassigned"}</div>
-                      </div>
-                      <div class="chrono-clock-value" id="tv-timer-${id}">00:00:00</div>
-                      <div>
-                          <span class="status-badge-pill">⚙️ In Progress</span>
-                      </div>
-                  `;
-                  
-                  body.appendChild(row);
+                row.innerHTML = `
+                    <div class="job-identity-block">
+                        <h2>${job.vehicle || "Untitled"}</h2>
+                        <span>ID: ${id.substring(0, 6).toUpperCase()} • Live Dataport</span>
+                    </div>
+                    <div><span class="classification-pill ${isAccident ? 'accident-mode' : ''}">${typeText}</span></div>
+                    <div class="technician-profile">
+                        <div class="tech-avatar">${initialLetter}</div>
+                        <div>${job.technician || "Unassigned"}</div>
+                    </div>
+                    <div class="chrono-clock-value ${timerClass}" id="tv-timer-${id}">00:00:00</div>
+                    <div><span class="status-badge-pill ${job.status === 'Pending' ? 'in-progress' : job.status === 'Paused' ? 'paused' : 'terminated'}">${statusLabel}</span></div>
+                `;
+                
+                body.appendChild(row);
 
-                  const startTime = job.timestamp ? job.timestamp.toDate() : new Date();
-                  tvIntervals[id] = setInterval(() => {
-                      const elapsed = new Date() - startTime;
-                      const secs = Math.floor(elapsed / 1000);
-                      const h = String(Math.floor(secs / 3600)).padStart(2, '0');
-                      const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
-                      const s = String(secs % 60).padStart(2, '0');
-                      
-                      const timerEl = document.getElementById(`tv-timer-${id}`);
-                      if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
-                  }, 1000);
-              });
-          });
+                // CHRONO TIMER COMPUTATION CONTROLLER
+                const createdTime = job.timestamp ? job.timestamp.toDate() : new Date();
+                
+                tvIntervals[id] = setInterval(() => {
+                    let totalElapsedSeconds = 0;
+
+                    if (job.status === "Pending") {
+                        const previousAccumulated = job.pausedDuration || 0;
+                        const lastChange = job.lastStatusChange ? job.lastStatusChange.toDate() : createdTime;
+                        const sinceLastChange = Math.floor((new Date() - lastChange) / 1000);
+                        totalElapsedSeconds = previousAccumulated + sinceLastChange;
+                    } else {
+                        totalElapsedSeconds = job.pausedDuration || 0;
+                    }
+
+                    const h = String(Math.floor(totalElapsedSeconds / 3600)).padStart(2, '0');
+                    const m = String(Math.floor((totalElapsedSeconds % 3600) / 60)).padStart(2, '0');
+                    const s = String(totalElapsedSeconds % 60).padStart(2, '0');
+                    
+                    const timerEl = document.getElementById(`tv-timer-${id}`);
+                    if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
+                }, 1000);
+            });
+        });
     </script>
 </body>
 </html>
